@@ -16,12 +16,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo '<script>setTimeout(function(){ window.location.href = "register.php"; }, 100);</script>';
         exit();
     }
-
+    // Hash the password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    
     $insertQuery = "INSERT INTO users (username, email, password, access) VALUES (:username, :email, :password, '1')";
     $insertStmt = $pdo->prepare($insertQuery);
     $insertStmt->bindParam(':username', $username);
     $insertStmt->bindParam(':email', $email);
-    $insertStmt->bindParam(':password', $password);
+    $insertStmt->bindParam(':password', $hashedPassword);
 
     if ($insertStmt->execute()) {
         echo '<script>alert("Đăng ký thành công! Hãy thực hiện việc đăng nhập ngay!");</script>';

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            if ($user['password'] == $password) {
+            if (password_verify($password, $user['password'])) {
                 if ($user['access'] == 1) {
                     $_SESSION['id_user'] = $user['id'];
                     $_SESSION['email'] = $user['email'];

@@ -43,19 +43,18 @@ unset($pdo);
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="../index.php">
-                <img src="../asset/icon/icon.png" alt="Logo" id="logo">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-lg">
+            <a class="navbar-brand p-1" href="../index.php">
+                <img id="logo" src="../asset/icon/icon.png" alt="Logo">
             </a>
-            <div class="d-flex">
-                <a href="account.php" class="nav-link">
-                    <i class="fas fa-user"></i>
+
+            <div class="d-flex justify-content-between mt-2">
+                <a href="account.php" class="nav-icon1">
+                    <i class="fa-solid fa-user"></i>
                 </a>
-                <span class="mx-2">|</span>
-                <a href="cart.html" class="nav-link">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
+                <span class="vr mx-2"></span>
+                <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
             </div>
         </div>
     </nav>
@@ -64,7 +63,7 @@ unset($pdo);
     <div class="container">
         <div class="form-container">
             <form name="form_account" id="form_account" action="update_account.php" method="POST">
-                <div class="title-image">
+                <div class="title-image mb-3">
                     <img src="../asset/icon/account.png" alt="Hình ảnh tiêu đề">
                 </div>
                 <div class="mb-3">
@@ -82,9 +81,10 @@ unset($pdo);
                     <input type="password" class="form-control" id="password" name="password" value="......" readonly>
                 </div>
                 <div class="mb-3 center-button">
-                    <button type="button" class="btn btn-danger btn-logout">
-                        Đăng xuất
-                    </button>
+                    <a href="update_account.php" class="btn btn-success">Cập nhật thông tin</a>
+                </div>
+                <div class="mb-3 center-button">
+                    <a href="logout.php" class="btn btn-danger">Đăng xuất</a>
                 </div>
             </form>
         </div>

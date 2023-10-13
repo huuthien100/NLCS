@@ -21,10 +21,6 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     <link rel="stylesheet" href="asset/style.css">
     <script src="asset/script.js"></script>
 <body>
-    <a href="view/logout.php">Đăng xuất</a>
-    <br>
-    <?php echo 'Welcome, ' . $_SESSION['email']; ?>
-    <?php echo 'Welcome, ' . $_SESSION['username']; ?>
     <!-- Nav 1 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-lg">
