@@ -1,0 +1,196 @@
+.navbar-brand img#logo {
+    width: 15rem;
+}
+
+.nav-icon1,
+.nav-icon2 {
+    font-size: 28px;
+    color: #000;
+}
+
+.nav-icon1:hover i,
+.nav-icon2:hover i {
+    color: rgba(1, 0, 0, 0.516);
+}
+
+.divider{
+    margin-top: 2px;
+}
+
+.nav-link{
+    font-size: large;
+    font-weight: 600;
+}
+
+.nav-link:hover{
+    font-weight: 700;
+}
+.stick-nav{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.list-group{
+    position: sticky;
+    top: 62px;
+}
+
+.card-text{
+    color: rgb(255, 42, 0);
+    font-weight: 500;
+}
+
+footer {
+    position: relative;
+    background-color: hsla(0, 0%, 73%, 0.112);
+    
+}
+
+footer p {
+    font-size: 20px;
+    color: #000000;
+    font-weight: 400;
+}
+
+.contact {
+    padding-top: 73px;
+}
+
+/* Product detail */
+.star {
+    font-size: 20px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.star.active {
+    color: #ffcc00;
+}
+
+
+.tab-pane {
+    font-size: larger;
+   margin-top: 10px;
+}
+
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+
+.image-container img {
+    max-width: 100%;
+}
+
+/* Đánh giá sản phẩm */
+.review {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+.review-avatar {
+    width: 50px;
+    float: left;
+    margin-right: 10px;
+}
+
+.review-avatar-img {
+    max-width: 100%;
+    border-radius: 50%;
+}
+
+.review-time {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.review-content {
+    overflow: hidden;
+}
+
+.review-header {
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.review-author {
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.review-rating {
+    float: right;
+}
+
+.review-rating i {
+    color: #f8c720;
+    margin-left: 2px;
+}
+
+.review-text {
+    clear: both;
+    line-height: 1.6;
+}
+
+.review-actions {
+    margin-top: 10px;
+}
+
+.review-actions a {
+    margin-right: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #333;
+}
+
+.review-actions a.btn-danger {
+    background-color: #d9534f;
+    border-color: #d9534f;
+    color: #fff;
+}
+
+.review-actions a.btn-danger:hover {
+    background-color: #c9302c;
+    border-color: #ac2925;
+    color: #fff;
+}
+
+.review-actions a.btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.review-actions a.btn-outline-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+/* Register */
+.form-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+    border: 1px solid #ced4da; 
+}
+.title-image {
+    text-align: center;
+}
+.title-image img {
+    max-width: 300px; 
+}
+.center-button {
+    text-align: center;
+}
