@@ -42,28 +42,42 @@ unset($pdo);
 </head>
 
 <body>
-    <!-- Navbar -->
+    <!-- Nav 1 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-lg">
-            <a class="navbar-brand p-1" href="../index.php">
+            <a class="navbar-brand p-1" href="#">
                 <img id="logo" src="../asset/icon/icon.png" alt="Logo">
             </a>
 
-            <div class="d-flex justify-content-between mt-2">
-                <a href="account.php" class="nav-icon1">
-                    <i class="fa-solid fa-user"></i>
-                </a>
-                <span class="vr mx-2"></span>
-                <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
+            <div class="d-flex justify-content-between">
+                <div class="dropdown pt-3">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?php
+                        if (isset($_SESSION['username'])) {
+                            echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
+                        }
+                        ?>
+
+                        <img src="../asset/icon/user.png" alt="user.png" width="35" height="35" class="rounded-circle">
+                    </a>
+                    <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
+                        <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" onclick="history.go(-1);">Quay lại</a></li>
+                        <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
-    <!-- End Navbar -->
-
-    <div class="container">
+    <!-- End Nav 1 -->
+    <div class="container-fluid d-flex justify-content-end align-items-center">
         <div class="form-container">
             <form name="form_account" id="form_account" action="update_account.php" method="POST">
-                <div class="title-image mb-3">
+                <div class="title-image m-3">
                     <img src="../asset/icon/account.png" alt="Hình ảnh tiêu đề">
                 </div>
                 <div class="mb-3">
@@ -83,12 +97,11 @@ unset($pdo);
                 <div class="mb-3 center-button">
                     <a href="update_account.php" class="btn btn-success">Cập nhật thông tin</a>
                 </div>
-                <div class="mb-3 center-button">
-                    <a href="logout.php" class="btn btn-danger">Đăng xuất</a>
-                </div>
             </form>
         </div>
+
     </div>
+
 </body>
 
 </html>

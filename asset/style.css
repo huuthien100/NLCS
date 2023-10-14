@@ -25,6 +25,7 @@
 .nav-link:hover{
     font-weight: 700;
 }
+
 .stick-nav{
     position: sticky;
     top: 0;
@@ -174,7 +175,7 @@ footer p {
     color: #fff;
 }
 
-/* Register */
+/* Register Login Form*/ 
 .form-container {
     max-width: 400px;
     margin: 0 auto;
@@ -193,4 +194,8 @@ footer p {
 }
 .center-button {
     text-align: center;
+}
+
+.font-black{
+    color: #000;
 }

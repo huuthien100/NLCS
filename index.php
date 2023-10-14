@@ -20,6 +20,7 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="asset/style.css">
     <script src="asset/script.js"></script>
+
 <body>
     <!-- Nav 1 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -28,12 +29,26 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
                 <img id="logo" src="asset/icon/icon.png" alt="Logo">
             </a>
 
-            <div class="d-flex justify-content-between mt-2">
-                <a href="view/account.php" class="nav-icon1">
-                    <i class="fa-solid fa-user"></i>
-                </a>
-                <span class="vr mx-2"></span>
-                <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
+            <div class="d-flex justify-content-between">
+                <div class="dropdown pt-3">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?php
+                        if (isset($_SESSION['username'])) {
+                            echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
+                        }
+                        ?>
+
+                        <img src="asset/icon/user.png" alt="user.png" width="35" height="35" class="rounded-circle">
+                    </a>
+                    <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
+                        <li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="view/logout.php">Đăng xuất</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -67,6 +82,11 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="nav/base.html">Base</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
                     </li>
                 </ul>
             </div>
