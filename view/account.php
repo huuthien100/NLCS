@@ -59,7 +59,7 @@ unset($pdo);
                         }
                         ?>
 
-                        <img src="../asset/icon/user.png" alt="user.png" width="35" height="35" class="rounded-circle">
+                        <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
                         <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>

@@ -24,11 +24,6 @@ try {
     $stmtComments = $pdo->prepare($sqlComments);
     $stmtComments->execute();
     $totalComments = $stmtComments->fetchColumn();
-
-    $sqlCategories = "SELECT COUNT(*) FROM category";
-    $stmtCategories = $pdo->prepare($sqlCategories);
-    $stmtCategories->execute();
-    $totalCategories = $stmtCategories->fetchColumn();
 } catch (PDOException $e) {
     echo "Database Error: " . $e->getMessage();
     exit;
@@ -42,7 +37,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý</title>
+    <title>Quản lý bình luận</title>
     <link rel="icon" type="image/png" href="../asset/icon/favicon.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -69,14 +64,16 @@ try {
                             echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
                         }
                         ?>
+
                         <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="../admin.php">Trang sản phẩm</a></li>
+                        <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
+                        <li><a class="dropdown-item" href="#" onclick="history.go(-1);">Quay lại</a></li>
                         <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
                     </ul>
                 </div>
@@ -86,7 +83,7 @@ try {
     <!-- End Nav 1 -->
     <div class="container-fluid">
         <div class="row flex-nowrap">
-            <!-- Sidebar -->
+             <!-- Sidebar -->
             <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-body-tertiary">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                     <ul class="nav flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
@@ -100,7 +97,6 @@ try {
                                 <i class="fas fa-users"></i> Quản lý thành viên
                             </a>
                         </li>
-
                         <li>
                             <a href="category_manage.php" class="nav-link px-0 align-middle font-black">
                                 <i class="fas fa-list"></i> Quản lý danh mục
@@ -121,13 +117,13 @@ try {
             </div>
             <!-- End Sidebar -->
             <div class="col py-3">
-                <h1 class="pb-2">Trang chủ quản lý</h1>
+                <h1>Quản lý bình luận</h1>
                 <div class="row">
-                    <!-- Card thành viên -->
-                    <div class="col-md-6">
+                    <!-- Card số thành viên -->
+                    <div class="col-md-4">
                         <div class="card mb-3" style="max-width: 540px;">
                             <div class="row g-0">
-                                <div class="col-md-4 p-2 pt-1 bg-primary">
+                                <div class="col-md-4 p-3 bg-primary">
                                     <img src="../asset/icon/user.png" class="img-fluid rounded-start" alt="...">
                                 </div>
                                 <div class="col-md-8">
@@ -142,31 +138,11 @@ try {
                         </div>
                     </div>
 
-                    <!-- Card danh mục -->
-                    <div class="col-md-6">
-                        <div class="card mb-3" style="max-width: 540px;">
-                            <div class="row g-0">
-                                <div class="col-md-4 p-2 bg-success">
-                                    <img src="../asset/icon/list.png" class="img-fluid rounded-start"
-                                        alt="Danh mục">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Danh mục</h5>
-                                        <p class="card-text">Số danh mục:
-                                            <?php echo $totalCategories; ?>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Card sản phẩm -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card mb-3" style="max-width: 540px;">
                             <div class="row g-0">
-                                <div class="col-md-4 p-2 bg-info">
+                                <div class="col-md-4 p-3 bg-info">
                                     <img src="../asset/icon/shopping_cart.png" class="img-fluid rounded-start"
                                         alt="Sản phẩm">
                                 </div>
@@ -183,10 +159,10 @@ try {
                     </div>
 
                     <!-- Card bình luận -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card mb-3" style="max-width: 540px;">
                             <div class="row g-0">
-                                <div class="col-md-4 p-2 bg-warning">
+                                <div class="col-md-4 p-3 bg-warning">
                                     <img src="../asset/icon/comment.png" class="img-fluid rounded-start" alt="Sản phẩm">
                                 </div>
                                 <div class="col-md-8">

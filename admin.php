@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['access'] !== 1) {
+if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || (isset($_SESSION['access']) && $_SESSION['access'] !== 0)) {
     header("Location: view/login.php");
     exit;
 }
@@ -42,7 +42,7 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
                         <img src="asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>
+                        <li><a class="dropdown-item" href="view/admin.php">Quản lý</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>

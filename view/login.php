@@ -28,11 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['id_user'] = $user['id'];
                     $_SESSION['email'] = $user['email'];
                     $_SESSION['username'] = $user['username'];
-                    header("Location: admin.php");
+                    header("Location: ../admin.php");
                     exit();
                 }
             } else {
-                $login_error = "Sai mật khẩu. Vui lòng thử lại.";
+                $password_error = "Sai mật khẩu. Vui lòng thử lại.";
             }
         } else {
             $login_error = "Email hoặc tên đăng nhập không tồn tại. Vui lòng thử lại.";
