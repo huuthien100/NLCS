@@ -3,7 +3,7 @@ session_start();
 require 'connect.php';
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
-    header("Location: view/login.php");
+    header("Location: login.php");
     exit;
 }
 

@@ -1,11 +1,31 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || (isset($_SESSION['access']) && $_SESSION['access'] !== 0)) {
+if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     header("Location: view/login.php");
     exit;
 }
+
+require 'view/connect.php';
+
+$email = $_SESSION['email'];
+$query = "SELECT access FROM users WHERE email = :email";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':email', $email);
+$stmt->execute();
+
+if ($stmt) {
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $access = $row['access'];
+
+    if ($access === 1) {
+        header("Location: view/login.php");
+        exit;
+    }
+}
+
 ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -20,17 +40,18 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || (isset($_SESS
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="asset/style.css">
     <script src="asset/script.js"></script>
+</head>
 
 <body>
     <!-- Nav 1 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-lg">
-            <a class="navbar-brand p-1" href="index.php">
+            <a class="navbar-brand p-1" href="#">
                 <img id="logo" src="asset/icon/icon.png" alt="Logo">
             </a>
 
             <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3">
+                <div class="dropdown pt-3" style="margin-left: 930px;">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                         id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <?php
@@ -39,7 +60,8 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || (isset($_SESS
                         }
                         ?>
 
-                        <img src="asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
+                        <img src="asset/icon/profile-user.png" alt="user.png" width="35" height="35"
+                            class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
                         <li><a class="dropdown-item" href="view/admin.php">Quản lý</a></li>
@@ -53,6 +75,7 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || (isset($_SESS
         </div>
     </nav>
     <!-- End Nav 1 -->
+
     <div class="divider"></div>
     <!-- Nav 2 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary stick-nav">
@@ -62,33 +85,40 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || (isset($_SESS
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Gundam
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="nav/hg.html">HG</a></li>
-                            <li><a class="dropdown-item" href="nav/rg.html">RG</a></li>
-                            <li><a class="dropdown-item" href="nav/mg.html">MG</a></li>
-                            <li><a class="dropdown-item" href="nav/pg.html">PG</a></li>
-                            <li><a class="dropdown-item" href="nav/sd.html">SD</a></li>
-                            <li><a class="dropdown-item" href="nav/mb.html">MB</a></li>
+                <div class="row">
+                    <div class="col-lg-10">
+                        <ul class="navbar-nav d-flex">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Gundam
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="nav/hg.html">HG</a></li>
+                                    <li><a class="dropdown-item" href="nav/rg.html">RG</a></li>
+                                    <li><a class="dropdown-item" href="nav/mg.html">MG</a></li>
+                                    <li><a class="dropdown-item" href="nav/pg.html">PG</a></li>
+                                    <li><a class="dropdown-item" href="nav/sd.html">SD</a></li>
+                                    <li><a class="dropdown-item" href="nav/mb.html">MB</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="nav/tool.html">Tool</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="nav/base.html">Base</a>
+                            </li>
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="nav/tool.html">Tool</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="nav/base.html">Base</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
-                    </li>
-                </ul>
+                    </div>
+                    <div class="col-lg-2">
+                        <ul class="navbar-nav" style="margin-right: 1533px;">
+                            <li class="nav-item">
+                                <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
             </div>
         </div>
     </nav>

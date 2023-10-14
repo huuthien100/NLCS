@@ -3,6 +3,7 @@ session_start();
 include 'connect.php';
 
 $login_error = '';
+$password_error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login = $_POST['login'];

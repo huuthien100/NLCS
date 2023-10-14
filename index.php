@@ -1,11 +1,71 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['access'] !== 1) {
+require 'view/connect.php';
+
+if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     header("Location: view/login.php");
     exit;
 }
+
+//Lấy sp ngẫu nhiên mỗi danh mục
+function getProductsGroupedByCategory($pdo)
+{
+    $query = "SELECT category.id_category, category.name_category, 
+              products.product_name, products.product_img, products.product_price
+              FROM category
+              LEFT JOIN products ON category.id_category = products.id_category
+              ORDER BY category.id_category, products.product_name";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+
+    $productsByCategory = array();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $category = $row['name_category'];
+        $product = array(
+            'name' => $row['product_name'],
+            'image' => $row['product_img'],
+            'price' => $row['product_price'],
+        );
+
+        $productsByCategory[$category][] = $product;
+    }
+
+    return $productsByCategory;
+}
+
+$productsByCategory = getProductsGroupedByCategory($pdo);
+
+
+//List Group
+function getCategories($pdo)
+{
+    $query = "SELECT * FROM category";
+    $stmt = $pdo->query($query);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$categories = getCategories($pdo);
+
+function getCategoriesWithProductCount($pdo)
+{
+    $query = "SELECT category.id_category, category.name_category, COUNT(products.id_product) as product_count
+              FROM category
+              LEFT JOIN products ON category.id_category = products.id_category
+              GROUP BY category.id_category, category.name_category";
+
+    $stmt = $pdo->query($query);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$categories = getCategoriesWithProductCount($pdo);
+//List Group End
 ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -13,13 +73,14 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gundam Shop</title>
-    <link rel="icon" type="image/png" href="asset/icon/favicon.png">
+    <link rel="icon" type="image.png" href="asset/icon/favicon.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="   https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="asset/style.css">
     <script src="asset/script.js"></script>
+</head>
 
 <body>
     <!-- Nav 1 -->
@@ -30,7 +91,7 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
             </a>
 
             <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3">
+                <div class="dropdown pt-3" style="margin-left: 943px;">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                         id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <?php
@@ -39,7 +100,8 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
                         }
                         ?>
 
-                        <img src="asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
+                        <img src="asset/icon/profile-user.png" alt="user.png" width="35" height="35"
+                            class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
                         <li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>
@@ -62,33 +124,38 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Gundam
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="nav/hg.html">HG</a></li>
-                            <li><a class="dropdown-item" href="nav/rg.html">RG</a></li>
-                            <li><a class="dropdown-item" href="nav/mg.html">MG</a></li>
-                            <li><a class="dropdown-item" href="nav/pg.html">PG</a></li>
-                            <li><a class="dropdown-item" href="nav/sd.html">SD</a></li>
-                            <li><a class="dropdown-item" href="nav/mb.html">MB</a></li>
+                <div class="row">
+                    <div class="col-lg-10">
+                        <ul class="navbar-nav d-flex">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Gundam
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <?php
+                                    foreach ($categories as $category) {
+                                        echo '<a class="dropdown-item" href="nav/' . strtolower($category['name_category']) . '.php">' . $category['name_category'] . '</a>';
+                                    }
+                                    ?>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="nav/tool.php">Tool</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="nav/base.php">Base</a>
+                            </li>
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="nav/tool.html">Tool</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="nav/base.html">Base</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
-                    </li>
-                </ul>
+                    </div>
+                    <div class="col-lg-2">
+                        <ul class="navbar-nav" style="margin-right: 1533px;">
+                            <li class="nav-item">
+                                <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -99,38 +166,11 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
             <div class="col-md-2">
                 <!-- Listgroup Category -->
                 <div class="list-group mt-1">
-                    <a href="nav/hg.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        HG
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
-                    <a href="nav/rg.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        RG
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
-                    <a href="nav/mg.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        MG
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
-                    <a href="nav/pg.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        PG
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
-                    <a href="n../av/sd.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        SD
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
-                    <a href="nav/mb.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        MB
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
-                    <a href="nav/tool.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        Tool
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
-                    <a href="nav/base.html" class="list-group-item d-flex justify-content-between align-items-center">
-                        Base
-                        <span class="badge bg-primary rounded-pill">6</span>
-                    </a>
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<a href="nav/' . strtolower($category['name_category']) . '.php" class="list-group-item d-flex justify-content-between align-items-center">' . $category['name_category'] . '<span class="badge bg-primary rounded-pill">' . $category['product_count'] . '</span></a>';
+                    }
+                    ?>
                 </div>
                 <!-- End Listgroup Category -->
             </div>
@@ -170,83 +210,32 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
                 <!-- End Carousel -->
                 <!-- Product -->
                 <div class="m-3 text-center mx-auto">
-                    <div class="row">
-                        <div class="col-md-4 mt-3">
-                            <div class="card">
-                                <img src="asset/product/HG/HG-Aerial Gundam/HG-Aerial Gundam (1).jpg"
-                                    class="card-img-top p-3" alt="HG-Aerial Gundam (1).jpg">
-                                <div class="card-body">
-                                    <h5 class="card-title">Aerial Gundam</h5>
-                                    <p class="card-text">580.000 VNĐ</p>
-                                    <a href="product_detail/HG/HG-Aerial_Gundam.html" class="btn btn-danger">Xem chi
-                                        tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mt-3">
-                            <div class="card">
-                                <img src="asset/product/RG/RG-Aile Strike Gundam/RG-Aile Strike Gundam (1).jpg"
-                                    class="card-img-top p-3" alt="RG-Aile Strike Gundam (1).jpg">
-                                <div class="card-body">
-                                    <h5 class="card-title">Aile Strike Gundam</h5>
-                                    <p class="card-text">730.000 VNĐ</p>
-                                    <a href="product_detail/RG/RG-Aile_Strike_Gundam.html" class="btn btn-danger">Xem
-                                        chi tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mt-3">
-                            <div class="card">
-                                <img src="asset/product/MG/MG-Avalanche Exia Dash Gundam/MG-Avalanche Exia Dash Gundam (1).jpg"
-                                    class="card-img-top p-3" alt="MG-Avalanche Exia Dash Gundam (1).jpg">
-                                <div class="card-body">
-                                    <h5 class="card-title">Avalanche Exia Dash Gundam</h5>
-                                    <p class="card-text">1.850.000 VNĐ</p>
-                                    <a href="product_detail/MG/MG-Avalanche_Exia_Dash_Gundam.html"
-                                        class="btn btn-danger">Xem chi tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mt-3">
-                            <div class="card">
-                                <img src="asset/product/PG/PG-00 Seven Sword Gundam/PG-00 Seven Sword Gundam (1).jpg"
-                                    class="card-img-top p-3" alt="PG-00 Seven Sword Gundam (1).jpg">
-                                <div class="card-body">
-                                    <h5 class="card-title">00 Seven Sword Gundam</h5>
-                                    <p class="card-text">7.400.000 VNĐ</p>
-                                    <a href="product_detail/PG/PG-00_Seven_Sword_Gundam.html" class="btn btn-danger">Xem
-                                        chi tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mt-3">
-                            <div class="card">
-                                <img src="asset/product/SD/SD-00 Gundam/SD-00 Gundam (1).jpg" class="card-img-top p-3"
-                                    alt="SD-00 Gundam (1).jpg">
-                                <div class="card-body">
-                                    <h5 class="card-title">00 Gundam</h5>
-                                    <p class="card-text">250.000 VNĐ</p>
-                                    <a href="product_detail/SD/SD-00_Gundam.html" class="btn btn-danger">Xem chi
-                                        tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mt-3">
-                            <div class="card">
-                                <img src="asset/product/MB/MB-Astray Gold Frame Amatsu Mina Gundam (Princess of the sky Ver.)/MB-Astray Gold Frame Amatsu Mina Gundam (Princess of the sky Ver.) (1).jpg"
-                                    class="card-img-top p-3"
-                                    alt="MB-Astray Gold Frame Amatsu Mina Gundam (Princess of the sky Ver.) (1).jpg">
-                                <div class="card-body">
-                                    <h5 class="card-title">Astray GF Amatsu Mina Gundam</h5>
-                                    <p class="card-text">4.500.000 VNĐ</p>
-                                    <a href="product_detail/MB/MB-Astray_Gold_Frame_Amatsu_Mina_Gundam.html"
-                                        class="btn btn-danger">Xem chi tiết</a>
-                                </div>
-                            </div>
-                        </div>
+                    <?php
+                    foreach ($productsByCategory as $category => $products) {
+                        echo '<div class="row">';
+
+                        foreach ($products as $product) {
+                            echo '<div class="col-lg-4 col-md-6 mt-3">
+                <div class="card">
+                    <img src="' . substr($product['image'], 3) . '"
+                        class="card-img-top p-3" alt="' . $product['image'] . '">
+                    <div class="card-body">
+                        <h5 class="card-title">' . $product['name'] . '</h5>
+                        <p class="card-text">' . number_format($product['price']) . ' VNĐ</p>
+                        <a href="product_detail/' . strtolower($category) . '/' . strtolower($category) . '-' . str_replace(' ', '_', strtolower($product['name'])) . '.php" class="btn btn-danger">Xem chi tiết</a>
                     </div>
                 </div>
-                <!-- End Product -->
+            </div>';
+                        }
+
+                        echo '</div>';
+                    }
+                    ?>
+
+
+
+                    <!-- End Product -->
+                </div>
             </div>
         </div>
     </div>
@@ -261,7 +250,6 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username']) || $_SESSION['ac
                     <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
                 </div>
                 <!-- End Address -->
-
                 <!-- Contact -->
                 <div class="col contact text-end">
                     <a href="https://facebook.com" target="_blank"><i class="icon fa-brands fa-facebook"></i></a>

@@ -7,8 +7,8 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     exit;
 }
 
-$category_id = $product_name = $product_img = $product_price = $product_detail = "";
-$category_id_err = $product_name_err = $product_img_err = $product_price_err = $product_detail_err = "";
+$category_id = $product_name = $product_img = $product_price = "";
+$category_id_err = $product_name_err = $product_img_err = $product_price_err = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate category ID
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_FILES["product_img"]) && $_FILES["product_img"]["error"] === UPLOAD_ERR_OK) {
         $tmp_name = $_FILES["product_img"]["tmp_name"];
         $file_name = $_FILES["product_img"]["name"];
-        $upload_dir = "../asset/product_img";
+        $upload_dir = "../asset/product_img/";
 
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
@@ -52,15 +52,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $product_price = $input_product_price;
     }
 
-    $input_product_detail = trim($_POST["product_detail"]);
-    if (empty($input_product_detail)) {
-        $product_detail_err = "Please enter product details.";
-    } else {
-        $product_detail = $input_product_detail;
-    }
-
-    if (empty($category_id_err) && empty($product_name_err) && empty($product_img_err) && empty($product_price_err) && empty($product_detail_err)) {
-        $sql = "INSERT INTO products (id_category, product_name, product_img, product_price, product_detail) VALUES (:id_category, :product_name, :product_img, :product_price, :product_detail)";
+    if (empty($category_id_err) && empty($product_name_err) && empty($product_img_err) && empty($product_price_err)) {
+        $sql = "INSERT INTO products (id_category, product_name, product_img, product_price) VALUES (:id_category, :product_name, :product_img, :product_price)";
 
         $stmt = $pdo->prepare($sql);
 
@@ -77,7 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="vi">

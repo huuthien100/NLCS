@@ -1,28 +1,12 @@
 <?php
 session_start();
+include 'connect.php';
 
-require_once "connect.php";
-
-$id_user = 1;
-
-$sql = "SELECT username, email, password FROM users WHERE id_user = :id_user";
-
-if ($stmt = $pdo->prepare($sql)) {
-    $stmt->bindParam(":id_user", $id_user, PDO::PARAM_INT);
-
-    if ($stmt->execute()) {
-        if ($stmt->rowCount() == 1) {
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            $_SESSION['username'] = $user["username"];
-            $_SESSION['email'] = $user["email"];
-            // Không lưu trữ mật khẩu trong phiên
-        }
-    }
-}
-
-unset($stmt);
-
-unset($pdo);
+// Fetch user information from the database
+$id_user = $_SESSION['id_user'];
+$query = "SELECT * FROM users WHERE id_user = :id_user";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':id_user', $id_user);
 ?>
 
 <!DOCTYPE html>
@@ -50,7 +34,7 @@ unset($pdo);
             </a>
 
             <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3">
+                <div class="dropdown pt-3" style="margin-left: 930px;">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                         id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <?php
@@ -62,11 +46,10 @@ unset($pdo);
                         <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>
+                        <li><a class="dropdown-item" href="../index.php">Trang chủ</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#" onclick="history.go(-1);">Quay lại</a></li>
                         <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
                     </ul>
                 </div>

@@ -13,30 +13,31 @@
     color: rgba(1, 0, 0, 0.516);
 }
 
-.divider{
+.divider {
     margin-top: 2px;
 }
 
-.nav-link{
+.nav-link {
     font-size: large;
     font-weight: 600;
 }
 
-.nav-link:hover{
+.nav-link:hover {
     font-weight: 700;
 }
 
-.stick-nav{
+.stick-nav {
     position: sticky;
     top: 0;
     z-index: 1000;
 }
-.list-group{
+
+.list-group {
     position: sticky;
     top: 62px;
 }
 
-.card-text{
+.card-text {
     color: rgb(255, 42, 0);
     font-weight: 500;
 }
@@ -44,7 +45,7 @@
 footer {
     position: relative;
     background-color: hsla(0, 0%, 73%, 0.112);
-    
+
 }
 
 footer p {
@@ -71,7 +72,7 @@ footer p {
 
 .tab-pane {
     font-size: larger;
-   margin-top: 10px;
+    margin-top: 10px;
 }
 
 .image-container {
@@ -175,7 +176,7 @@ footer p {
     color: #fff;
 }
 
-/* Register Login Form*/ 
+/* Register Login Form*/
 .form-container {
     max-width: 400px;
     margin: 0 auto;
@@ -184,19 +185,26 @@ footer p {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-top: 50px;
-    border: 1px solid #ced4da; 
+    border: 1px solid #ced4da;
 }
+
 .title-image {
     text-align: center;
 }
+
 .title-image img {
-    max-width: 300px; 
+    max-width: 300px;
 }
+
 .center-button {
     text-align: center;
 }
 
-.font-black{
+.font-black {
     color: #000;
 }
 
+.navbar-nav.ml-auto {
+    margin-right: 20px;
+    /* Adjust the margin as needed */
+}

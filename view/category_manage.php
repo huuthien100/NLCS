@@ -3,7 +3,7 @@ session_start();
 require 'connect.php';
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
-    header("Location: view/login.php");
+    header("Location: login.php");
     exit;
 }
 
@@ -61,7 +61,7 @@ try {
             </a>
 
             <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3">
+                <div class="dropdown pt-3" style="margin-left: 930px;">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                         id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <?php
@@ -69,16 +69,14 @@ try {
                             echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
                         }
                         ?>
-
                         <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>
+                        <li><a class="dropdown-item" href="../admin.php">Trang sản phẩm</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="admin.php">Quay lại</a></li>
                         <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
                     </ul>
                 </div>

@@ -79,11 +79,10 @@ if (isset($_POST['submit'])) {
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>
+                        <li><a class="dropdown-item" href="admin.php">Trang chủ</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="users_manage.php">Quay lại</a></li>
                         <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
                     </ul>
                 </div>

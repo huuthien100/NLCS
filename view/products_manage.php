@@ -3,8 +3,37 @@ session_start();
 require 'connect.php';
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
-    header("Location: view/login.php");
+    header("Location: login.php");
     exit;
+}
+
+if (isset($_POST['delete_product'])) {
+    try {
+        $product_id = $_POST['delete_product'];
+
+        $deleteSql = "DELETE FROM products WHERE id_product = :product_id";
+        $deleteStmt = $pdo->prepare($deleteSql);
+        $deleteStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $deleteStmt->execute();
+
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+try {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sql = "SELECT p.id_product, p.product_name, p.product_img, p.product_price, c.name_category FROM products p
+            INNER JOIN category c ON p.id_category = c.id_category";
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute();
+
+    $productInformation = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
 }
 ?>
 
@@ -22,12 +51,6 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../asset/style.css">
     <script src="../asset/script.js"></script>
-    <style>
-        .mr-3 {
-            margin-right: 10px;
-        }
-    </style>
-
 </head>
 
 <body>
@@ -39,7 +62,7 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
             </a>
 
             <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3">
+                <div class="dropdown pt-3" style="margin-left: 930px;">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                         id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <?php
@@ -47,16 +70,14 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
                             echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
                         }
                         ?>
-
                         <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>
+                        <li><a class="dropdown-item" href="../admin.php">Trang sản phẩm</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#" onclick="history.go(-1);">Quay lại</a></li>
                         <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
                     </ul>
                 </div>
@@ -100,113 +121,97 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
                 </div>
             </div>
             <!-- End Sidebar -->
-            <div class="col p-3">
-                <h1>Quản lý sản phẩm</h1>
-                <div class="wrapper">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mt-5 mb-3 clearfix">
-                                    <a href="add_products.php" class="btn btn-success pull-right"><i
-                                            class="fa fa-plus"></i> Thêm sản phẩm mới</a>
-                                </div>
-                                <?php
-                                try {
-                                    require_once "connect.php";
-
-                                    $sql = "SELECT products.*, category.name_category FROM products JOIN category ON products.id_category = category.id_category";
-                                    $stmt = $pdo->query($sql);
-
-                                    if ($stmt->rowCount() > 0) {
-                                        echo '<table class="table table-bordered table-striped">';
-                                        echo "<thead>";
-                                        echo "<tr>";
-                                        echo "<th>Grade</th>";
-                                        echo "<th>Tên sản phẩm</th>";
-                                        echo "<th>Hình ảnh sản phẩm</th>";
-                                        echo "<th>Giá sản phẩm</th>";
-                                        echo "<th>Thao tác</th>";
-                                        echo "</tr>";
-                                        echo "</thead>";
-                                        echo "<tbody>";
-
-                                        while ($row = $stmt->fetch()) {
-                                            echo "<tr>";
-                                            echo "<td>" . $row['name_category'] . "</td>";
-                                            echo "<td>" . $row['product_name'] . "</td>";
-                                            echo "<td><img src='" . $row['product_img'] . "' width='50' height='50'></td>";
-                                            echo "<td>" . $row['product_price'] . " VNĐ</td>";
-                                            echo "<td>";
-                                            echo '<a href="update_product.php?id=' . $row['id_product'] . '" class="mr-3" title="Chỉnh sửa sản phẩm" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>';
-                                            echo '<a href="#" class="mr-3 delete-product" title="Xóa sản phẩm" data-toggle="tooltip" data-product-id="' . $row['id_product'] . '"><span class="fa fa-trash"></span></a>';
-
-                                            echo "</td>";
-                                            echo "</tr>";
-                                        }
-
-                                        echo "</tbody>";
-                                        echo "</table>";
-                                    } else {
-                                        echo '<div class="alert alert-danger"><em>Không tìm thấy bản ghi nào.</em></div>';
-                                    }
-                                } catch (PDOException $e) {
-                                    echo "Oops! Có lỗi xảy ra: " . $e->getMessage();
-                                }
-                                $pdo = null;
-                                ?>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col py-3">
+                <div class="d-flex justify-content-between">
+                    <h1>Quản lý sản phẩm</h1>
+                    <a href="add_products.php" class="btn btn-success pt-3">
+                        Thêm sản phẩm <i class="fa-solid fa-plus" style="color: #ffffff;"></i>
+                    </a>
                 </div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Tên danh mục</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Hình ảnh sản phẩm</th>
+                            <th>Giá sản phẩm</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (isset($productInformation) && is_array($productInformation)) {
+                            foreach ($productInformation as $product) {
+                                echo "<tr>";
+                                echo "<td>" . $product['name_category'] . "</td>";
+                                echo "<td>" . $product['product_name'] . "</td>";
+                                echo "<td><img src='" . $product['product_img'] . "' alt='" . $product['product_name'] . "' width='200' height='200'></td>";
+                                echo "<td>" . number_format($product['product_price'], 0, '', '.') . " VNĐ</td>";
+                                echo "<td>
+                                    <a href='edit_products.php?product_id=" . $product['id_product'] . "' class='btn btn-primary'>Edit <i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
+                                    <button type='button' class='btn btn-danger delete-product' data-product-id='" . $product['id_product'] . "'>Delete <i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
+
+                                    <form method='post' class='delete-product-form' data-product-id='" . $product['id_product'] . "'>
+                                        <input type='hidden' name='delete_product' value='" . $product['id_product'] . "'>
+                                    </form>
+                                </td>";
+                                echo "</tr>";
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
             </div>
-            <div class="modal fade" id="confirmDeleteProductModal" tabindex="-1" role="dialog"
-                aria-labelledby="exampleModalLabelProduct" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabelProduct">Xác nhận xóa sản phẩm</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                style="border: none; box-shadow: none; background: none; font-size: 25px">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            Bạn có chắc chắn muốn xóa sản phẩm này?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                            <button type="button" class="btn btn-danger" id="confirmDeleteProductButton">Xóa</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                $(document).ready(function () {
-                    $(".delete-product").on("click", function () {
-                        var productId = $(this).data("product-id");
-
-                        $("#confirmDeleteProductButton").data("product-id", productId);
-
-                        $("#confirmDeleteProductModal").modal("show");
-                    });
-
-                    $("#confirmDeleteProductButton").on("click", function () {
-                        var productId = $(this).data("product-id");
-                        window.location.href = "delete_product.php?id=" + productId;
-                    });
-
-                    $("#confirmDeleteProductModal .btn-secondary").on("click", function () {
-                        $("#confirmDeleteProductModal").modal("hide");
-                    });
-
-                    $("#confirmDeleteProductModal .close").on("click", function () {
-                        $("#confirmDeleteProductModal").modal("hide");
-                    });
-                });
-            </script>
         </div>
     </div>
+
+    <div class="modal fade" id="confirmDeleteProductModal" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalLabelProduct" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabelProduct">Xác nhận xóa sản phẩm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        style="border: none; box-shadow: none; background: none; font-size:25px">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa sản phẩm này?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteProductButton">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $(".delete-product").on("click", function () {
+                var productId = $(this).data("product-id");
+
+                $("#confirmDeleteProductButton").data("product-id", productId);
+
+                $("#confirmDeleteProductModal").modal("show");
+            });
+
+            $("#confirmDeleteProductButton").on("click", function () {
+                var productId = $(this).data("product-id");
+                $(".delete-product-form[data-product-id='" + productId + "']").submit();
+                $("#confirmDeleteProductModal").modal("hide");
+            });
+
+            $("#confirmDeleteProductModal .btn-secondary").on("click", function () {
+                $("#confirmDeleteProductModal").modal("hide");
+            });
+
+            $("#confirmDeleteProductModal .close").on("click", function () {
+                $("#confirmDeleteProductModal").modal("hide");
+            });
+        });
+    </script>
 </body>
 
 </html>
