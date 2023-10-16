@@ -228,28 +228,31 @@ $categories = getCategoriesWithProductCount($pdo);
                     foreach ($productsByCategory as $category => $products) {
                         echo '<div class="row">';
 
-                        foreach ($products as $product) {
+                        // Trộn sản phẩm
+                        shuffle($products);
+
+                        // Giới hạn 3 sản phẩm
+                        $randomProducts = array_slice($products, 0, 3);
+
+                        foreach ($randomProducts as $product) {
                             echo '<div class="col-lg-4 col-md-6 mt-3">
-                <div class="card">
-                    <img src="' . substr($product['image'], 3) . '"
-                        class="card-img-top p-3" alt="' . $product['image'] . '">
-                    <div class="card-body">
-                        <h5 class="card-title">' . $product['name'] . '</h5>
-                        <p class="card-text">' . number_format($product['price']) . ' VNĐ</p>
-                        <a href="product_detail/' . strtolower($category) . '/' . strtolower($category) . '-' . str_replace(' ', '_', strtolower($product['name'])) . '.php" class="btn btn-danger">Xem chi tiết</a>
-                    </div>
-                </div>
-            </div>';
+                                <div class="card">
+                                    <img src="' . substr($product['image'], 3) . '"
+                                        class="card-img-top p-3" alt="' . $product['image'] . '">
+                                    <div class="card-body">
+                                        <h5 class="card-title">' . $product['name'] . '</h5>
+                                        <p class="card-text">' . number_format($product['price']) . ' VNĐ</p>
+                                        <a href="product_detail/' . strtolower($category) . '/' . strtolower($category) . '-' . str_replace(' ', '_', strtolower($product['name'])) . '.php" class="btn btn-danger">Xem chi tiết</a>
+                                    </div>
+                                </div>
+                            </div>';
                         }
 
                         echo '</div>';
                     }
                     ?>
-
-
-
-                    <!-- End Product -->
                 </div>
+                <!-- End Product -->
             </div>
         </div>
     </div>

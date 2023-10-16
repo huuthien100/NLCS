@@ -145,7 +145,6 @@ $categories = getCategories($pdo);
         </div>
     </nav>
     <!-- End Nav 2 -->
-
     <!-- Product -->
     <div class="container-lg">
         <div class="m-3 text-center mx-auto">
@@ -153,31 +152,18 @@ $categories = getCategories($pdo);
                 <?php
                 // Hiển thị sản phẩm từ cơ sở dữ liệu
                 if (isset($productInformation) && is_array($productInformation)) {
-                    foreach ($productInformation as $row) {
+                    foreach ($productInformation as $proinf) {
                         echo '<div class="col-md-4 mt-3 col-sm-6">
                             <div class="card">
-                                <img src="' . $row["product_img"] . '" class="card-img-top p-3" alt="' . $row["product_name"] . '">
+                                <img src="' . $proinf["product_img"] . '" class="card-img-top p-3" alt="' . $proinf["product_name"] . '">
                                 <div class="card-body">
-                                    <h5 class="card-title">' . $row["product_name"] . '</h5>
-                                    <p class="card-text">' . number_format($row["product_price"], 0, '', '.') . ' VNĐ</p>
-                                    <a href="../product_detail/HG/HG-' . str_replace(' ', '_', $row["product_name"]) . '.html" class="btn btn-danger">Xem chi tiết</a>
+                                    <h5 class="card-title">' . $proinf["product_name"] . '</h5>
+                                    <p class="card-text">' . number_format($proinf["product_price"], 0, '', '.') . ' VNĐ</p>
+                                    <a href="../product_detail/' . strtolower($proinf['name_category']) . '/' . strtolower($proinf['name_category']) . '-' . str_replace(' ', '_', $proinf["product_name"]) . '.php" class="btn btn-danger">Xem chi tiết</a>
                                 </div>
                             </div>
                         </div>';
                     }
-                }
-
-                if (isset($latestProduct)) {
-                    echo '<div class="col-md-4 mt-3 col-sm-6">
-                        <div class="card">
-                            <img src="' . $latestProduct["product_img"] . '" class="card-img-top p-3" alt="' . $latestProduct["product_name"] . '">
-                            <div class="card-body">
-                                <h5 class="card-title">' . $latestProduct["product_name"] . '</h5>
-                                <p class="card-text">' . number_format($latestProduct["product_price"], 0, '', '.') . ' VNĐ</p>
-                                <a href="../product_detail/HG/HG-' . str_replace(' ', '_', $latestProduct["product_name"]) . '.html" class="btn btn-danger">Xem chi tiết</a>
-                            </div>
-                        </div>
-                    </div>';
                 }
                 ?>
             </div>
@@ -191,7 +177,7 @@ $categories = getCategories($pdo);
             <div class="row">
                 <!-- Address -->
                 <div class="col address"><a href="#"><img src="../asset/icon/icon.png" alt=""
-                        style="width: 300px; margin-left: -25px;"></a>
+                            style="width: 300px; margin-left: -25px;"></a>
                     <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
                 </div>
                 <!-- End Address -->
@@ -213,4 +199,3 @@ $categories = getCategories($pdo);
 </body>
 
 </html>
-
