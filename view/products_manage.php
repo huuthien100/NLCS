@@ -74,7 +74,7 @@ try {
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="../admin.php">Trang sản phẩm</a></li>
+                        <li><a class="dropdown-item" href="../index.php">Trang sản phẩm</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>

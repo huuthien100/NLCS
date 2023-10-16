@@ -2,16 +2,9 @@
 session_start();
 require 'connect.php';
 
-if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
-    header("Location: view/login.php");
-    exit;
-}
-
-$category_id = $product_name = $product_img = $product_price = "";
-$category_id_err = $product_name_err = $product_img_err = $product_price_err = "";
+$category_id_err = $product_name_err = $product_img_err = $product_price_err = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate category ID
     $input_category_id = trim($_POST["category_id"]);
     if (empty($input_category_id)) {
         $category_id_err = "Please select a category.";
@@ -29,20 +22,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_FILES["product_img"]) && $_FILES["product_img"]["error"] === UPLOAD_ERR_OK) {
         $tmp_name = $_FILES["product_img"]["tmp_name"];
         $file_name = $_FILES["product_img"]["name"];
-        $upload_dir = "../asset/product_img/";
 
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
+        $folder_name = preg_replace('/ \(\d+\)\.jpg/', '', $file_name);
 
-        $product_img = $upload_dir . $file_name;
+        $category_name = getCategoryName($pdo, $category_id);
 
-        if (move_uploaded_file($tmp_name, $product_img)) {
+        if ($category_name) {
+            $upload_dir = "../asset/product/$category_name/$folder_name/";
+
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+
+            $product_img = $upload_dir . $file_name;
+
+            if (move_uploaded_file($tmp_name, $product_img)) {
+            } else {
+                $product_img_err = "Failed to upload the image.";
+            }
         } else {
-            $product_img_err = "Failed to upload the image.";
+            echo "Failed to get the category name.";
         }
-    } else {
-        $product_img_err = "Please select a valid image file.";
     }
 
     $input_product_price = trim($_POST["product_price"]);
@@ -61,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":product_name", $product_name, PDO::PARAM_STR);
         $stmt->bindParam(":product_img", $product_img, PDO::PARAM_STR);
         $stmt->bindParam(":product_price", $product_price, PDO::PARAM_STR);
+
         if ($stmt->execute()) {
             header("location: products_manage.php");
             exit();
@@ -68,6 +69,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Something went wrong. Please try again later.";
         }
     }
+}
+
+// Function to get the category name based on category ID
+function getCategoryName($pdo, $category_id)
+{
+    $query = "SELECT name_category FROM category WHERE id_category = :category_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":category_id", $category_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? $row['name_category'] : false;
 }
 ?>
 
@@ -151,10 +163,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="mb-3">
                     <label for="product_name" class="form-label"><i class="fa-solid fa-file"></i> Tên sản phẩm:</label>
                     <input type="text" class="form-control" id="product_name" name="product_name"
-                        placeholder="Nhập tên sản phẩm" required value="<?php echo $product_name; ?>">
+                        placeholder="Nhập tên sản phẩm" required
+                        value="<?php echo isset($product_name) ? $product_name : ''; ?>">
                     <span class="help-block">
-                        <?php echo $product_name_err; ?>
+                        <?php echo isset($product_name_err) ? $product_name_err : ''; ?>
                     </span>
+
                 </div>
                 <div class="mb-3">
                     <label for="product_img" class="form-label"><i class="fa-solid fa-image"></i> Hình ảnh sản
@@ -170,10 +184,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="product_price" class="form-label"><i class="fa-solid fa-dollar-sign"></i> Giá sản
                         phẩm:</label>
                     <input type="text" class="form-control" id="product_price" name="product_price"
-                        placeholder="Nhập giá sản phẩm" required value="<?php echo $product_price; ?>">
+                        placeholder="Nhập giá sản phẩm" required
+                        value="<?php echo isset($product_price) ? $product_price : ''; ?>">
                     <span class="help-block">
-                        <?php echo $product_price_err; ?>
+                        <?php echo isset($product_price_err) ? $product_price_err : ''; ?>
                     </span>
+
                 </div>
                 <div class="center-button">
                     <button type="submit" name="submit" class="btn btn-success">Thêm sản phẩm</button>

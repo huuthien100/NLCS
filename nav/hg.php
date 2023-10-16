@@ -24,6 +24,25 @@ try {
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
+
+$userEmail = $_SESSION['email'];
+$query = "SELECT access FROM users WHERE email = :email";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$access = $user['access'];
+
+function getCategories($pdo)
+{
+    $query = "SELECT * FROM category";
+    $stmt = $pdo->query($query);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$categories = getCategories($pdo);
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +83,13 @@ try {
                             class="rounded-circle">
                     </a>
                     <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>
+                        <?php
+                        if ($access == 0) {
+                            echo '<li><a class="dropdown-item" href="../view/admin.php">Quản lý</a></li>';
+                        } else if ($access == 1) {
+                            echo '<li><a class="dropdown-item" href="../view/account.php">Tài khoản</a></li>';
+                        }
+                        ?>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -93,19 +118,18 @@ try {
                                     Gundam
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="nav/hg.html">HG</a></li>
-                                    <li><a class="dropdown-item" href="nav/rg.html">RG</a></li>
-                                    <li><a class="dropdown-item" href="nav/mg.html">MG</a></li>
-                                    <li><a class="dropdown-item" href="nav/pg.html">PG</a></li>
-                                    <li><a class="dropdown-item" href="nav/sd.html">SD</a></li>
-                                    <li><a class="dropdown-item" href="nav/mb.html">MB</a></li>
+                                    <?php
+                                    foreach ($categories as $category) {
+                                        echo '<a class="dropdown-item" href="' . strtolower($category['name_category']) . '.php">' . $category['name_category'] . '</a>';
+                                    }
+                                    ?>
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="nav/tool.html">Tool</a>
+                                <a class="nav-link" href="tool.php">Tool</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="nav/base.html">Base</a>
+                                <a class="nav-link" href="base.php">Base</a>
                             </li>
                         </ul>
                     </div>
