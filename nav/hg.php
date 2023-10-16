@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../view../connect.php';
+require '../view/connect.php';
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     header("Location: login.php");
