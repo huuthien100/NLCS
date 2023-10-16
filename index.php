@@ -8,6 +8,15 @@ if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     exit;
 }
 
+$userEmail = $_SESSION['email'];
+$query = "SELECT access FROM users WHERE email = :email";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$access = $user['access'];
+
 //Lấy sp ngẫu nhiên mỗi danh mục
 function getProductsGroupedByCategory($pdo)
 {
@@ -83,38 +92,45 @@ $categories = getCategoriesWithProductCount($pdo);
 </head>
 
 <body>
-    <!-- Nav 1 -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-lg">
-            <a class="navbar-brand p-1" href="index.php">
-                <img id="logo" src="asset/icon/icon.png" alt="Logo">
-            </a>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-lg">
+        <a class="navbar-brand p-1" href="index.php">
+            <img id="logo" src="asset/icon/icon.png" alt="Logo">
+        </a>
 
-            <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3" style="margin-left: 943px;">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <?php
-                        if (isset($_SESSION['username'])) {
-                            echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
-                        }
-                        ?>
+        <div class="d-flex justify-content-between">
+            <div class="dropdown pt-3" style="margin-left: 943px;">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?php
+                    if (isset($_SESSION['username'])) {
+                        echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
+                    }
+                    ?>
 
-                        <img src="asset/icon/profile-user.png" alt="user.png" width="35" height="35"
-                            class="rounded-circle">
-                    </a>
-                    <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="view/logout.php">Đăng xuất</a></li>
-                    </ul>
-                </div>
+                    <img src="asset/icon/profile-user.png" alt="user.png" width="35" height="35"
+                        class="rounded-circle">
+                </a>
+                <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
+                    <?php
+                    if ($access == 0) {
+                        // Display the "Quản lý" option for admin users
+                        echo '<li><a class="dropdown-item" href="view/admin.php">Quản lý</a></li>';
+                    } else if ($access == 1) {
+                        // Display the "Tài khoản" option for regular users
+                        echo '<li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>';
+                    }
+                    ?>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="view/logout.php">Đăng xuất</a></li>
+                </ul>
             </div>
         </div>
-    </nav>
-    <!-- End Nav 1 -->
+    </div>
+</nav>
+
     <div class="divider"></div>
     <!-- Nav 2 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary stick-nav">

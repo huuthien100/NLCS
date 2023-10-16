@@ -19,25 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user) {
             if (password_verify($password, $user['password'])) {
-                if ($user['access'] == 1) {
-                    $_SESSION['id_user'] = $user['id'];
-                    $_SESSION['email'] = $user['email'];
-                    $_SESSION['username'] = $user['username'];
-                    header("Location: ../index.php");
-                    exit();
-                } elseif ($user['access'] == 0) {
-                    $_SESSION['id_user'] = $user['id'];
-                    $_SESSION['email'] = $user['email'];
-                    $_SESSION['username'] = $user['username'];
-                    header("Location: ../admin.php");
-                    exit();
-                }
+                $_SESSION['id_user'] = $user['id'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['username'] = $user['username'];
+                header("Location: ../index.php");
+                exit();
             } else {
                 $password_error = "Sai mật khẩu. Vui lòng thử lại.";
             }
         } else {
             $login_error = "Email hoặc tên đăng nhập không tồn tại. Vui lòng thử lại.";
-        }        
+        }
     } catch (PDOException $e) {
         echo "Lỗi trong quá trình kiểm tra đăng nhập: " . $e->getMessage();
     }
@@ -88,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 Chưa có tài khoản?<a href="register.php"> Đăng ký</a>
                 <div class="center-button mt-3">
-                    <button type="submit" class="btn btn-success">Đăng ký</button>
+                    <button type="submit" class="btn btn-success">Đăng nhập</button>
                 </div>
             </form>
         </div>
