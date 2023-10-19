@@ -1,19 +1,14 @@
 <?php
-session_start();
-require 'connect.php';
-
-if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
-    header("Location: view/login.php");
-    exit;
-}
+require '../include/connect.php';
+require '../include/user_session.php';
 
 if (isset($_POST['delete_user'])) {
     try {
-        $user_id = $_POST['delete_user'];
+        $username = $_POST['delete_user'];
 
-        $deleteSql = "DELETE FROM users WHERE id_user = :user_id";
+        $deleteSql = "DELETE FROM users WHERE username = :username";
         $deleteStmt = $pdo->prepare($deleteSql);
-        $deleteStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $deleteStmt->bindParam(':username', $username, PDO::PARAM_STR);
         $deleteStmt->execute();
 
     } catch (PDOException $e) {
@@ -24,7 +19,7 @@ if (isset($_POST['delete_user'])) {
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $sql = "SELECT id_user, username, email FROM users";
+    $sql = "SELECT username, email FROM users";
 
     $stmt = $pdo->prepare($sql);
 
@@ -143,11 +138,11 @@ try {
                                 echo "<td>" . $user['username'] . "</td>";
                                 echo "<td>" . $user['email'] . "</td>";
                                 echo "<td>
-                                <a href='edit_users.php?user_id=" . $user['id_user'] . "' class='btn btn-primary'>Edit <i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
-                                <button type='button' class='btn btn-danger delete-user' data-user-id='" . $user['id_user'] . "'>Delete <i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
-                
-                                <form method='post' class='delete-user-form' data-user-id='" . $user['id_user'] . "'>
-                                    <input type='hidden' name='delete_user' value='" . $user['id_user'] . "'>
+                                <a href='edit_users.php?username=" . $user['username'] . "' class='btn btn-primary'>Edit <i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
+                                <button type='button' class='btn btn-danger delete-user' data-username='" . $user['username'] . "'>Delete <i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
+
+                                <form method='post' class='delete-user-form' data-username='" . $user['username'] . "'>
+                                    <input type='hidden' name='delete_user' value='" . $user['username'] . "'>
                                 </form>
                                 </td>";
                                 echo "</tr>";
@@ -181,20 +176,19 @@ try {
             </div>
         </div>
     </div>
-
     <script>
         $(document).ready(function () {
             $(".delete-user").on("click", function () {
-                var userId = $(this).data("user-id");
+                var username = $(this).data("username");
 
-                $("#confirmDeleteUserButton").data("user-id", userId);
+                $("#confirmDeleteUserButton").data("username", username);
 
                 $("#confirmDeleteUserModal").modal("show");
             });
 
             $("#confirmDeleteUserButton").on("click", function () {
-                var userId = $(this).data("user-id");
-                $(".delete-user-form[data-user-id='" + userId + "']").submit();
+                var username = $(this).data("username");
+                $(".delete-user-form[data-username='" + username + "']").submit();
                 $("#confirmDeleteUserModal").modal("hide");
             });
 

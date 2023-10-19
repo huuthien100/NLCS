@@ -1,14 +1,21 @@
 <?php
-session_start();
-require 'connect.php';
+require '../include/connect.php';
+require '../include/user_session.php';
 
-if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit;
+function isProductNameExistsInCategory($pdo, $product_name, $category_id, $product_id)
+{
+    $check_name_query = "SELECT product_name FROM products WHERE product_name = :product_name AND id_category = :category_id AND id_product <> :product_id";
+    $check_name_stmt = $pdo->prepare($check_name_query);
+    $check_name_stmt->bindParam(':product_name', $product_name, PDO::PARAM_STR);
+    $check_name_stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+    $check_name_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+    $check_name_stmt->execute();
+
+    return $check_name_stmt->rowCount() > 0;
 }
 
 $product_id = $category_id = $product_name = $product_img = $product_price = "";
-$category_id_err = $product_name_err = $product_img_err = $product_price_err = "";
+$category_error = $name_error = $img_error = $price_error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['edit_product'])) {
@@ -17,6 +24,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $category_id = $_POST['category_id'];
             $product_name = $_POST['product_name'];
             $product_price = $_POST['product_price'];
+
+            if (empty($category_id)) {
+                $category_error = "<span style='color: red;'>Vui lòng chọn danh mục.</span>";
+            }
+
+            if (empty($product_name)) {
+                $name_error = "<span style='color: red;'>Vui lòng nhập tên sản phẩm.</span>";
+            } elseif (isProductNameExistsInCategory($pdo, $product_name, $category_id, $product_id)) {
+                $name_error = "<span style='color: red;'>Tên sản phẩm đã tồn tại trong danh mục này.</span>";
+            }
 
             if (isset($_FILES["product_img"]) && $_FILES["product_img"]["error"] === UPLOAD_ERR_OK) {
                 $tmp_name = $_FILES["product_img"]["tmp_name"];
@@ -31,35 +48,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 if (move_uploaded_file($tmp_name, $product_img)) {
                 } else {
-                    $product_img_err = "Không thể tải lên ảnh.";
+                    $img_error = "<span style='color: red;'>Không thể tải lên ảnh.</span>";
                 }
-            } else {
-                $product_img = $_POST['existing_product_img'];
             }
 
-            $updateSql = "UPDATE products 
-                          SET id_category = :category_id, 
-                              product_name = :product_name, 
-                              product_img = :product_img, 
-                              product_price = :product_price 
-                          WHERE id_product = :product_id";
+            if (empty($product_price) || !is_numeric($product_price) || $product_price <= 0) {
+                $price_error = "<span style='color: red;'>Giá sản phẩm không hợp lệ.</span>";
+            }
 
-            $updateStmt = $pdo->prepare($updateSql);
+            if (empty($category_error) && empty($name_error) && empty($img_error) && empty($price_error)) {
+                $updateSql = "UPDATE products 
+                              SET id_category = :category_id, 
+                                  product_name = :product_name, 
+                                  product_img = :product_img, 
+                                  product_price = :product_price 
+                              WHERE id_product = :product_id";
 
-            $updateStmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
-            $updateStmt->bindParam(':product_name', $product_name, PDO::PARAM_STR);
-            $updateStmt->bindParam(':product_img', $product_img, PDO::PARAM_STR);
-            $updateStmt->bindParam(':product_price', $product_price, PDO::PARAM_STR);
-            $updateStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+                $updateStmt = $pdo->prepare($updateSql);
 
-            if ($updateStmt->execute()) {
-                echo '<script>alert("Sản phẩm đã được cập nhật thành công.");</script>';
-                echo '<script>setTimeout(function(){ window.location.href = "products_manage.php"; }, 100);</script>';
-                exit();
-            } else {
-                echo '<script>alert("Có lỗi xảy ra: Không thể cập nhật sản phẩm.");</script>';
-                header("Location: products_manage.php");
-                exit();
+                $updateStmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+                $updateStmt->bindParam(':product_name', $product_name, PDO::PARAM_STR);
+                $updateStmt->bindParam(':product_img', $product_img, PDO::PARAM_STR);
+                $updateStmt->bindParam(':product_price', $product_price, PDO::PARAM_STR);
+                $updateStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+
+                if ($updateStmt->execute()) {
+                    echo '<script>alert("Sản phẩm đã được cập nhật thành công.");</script>';
+                    echo '<script>setTimeout(function(){ window.location.href = "products_manage.php"; }, 100);</script>';
+                    exit();
+                } else {
+                    echo '<script>alert("Có lỗi xảy ra: Không thể cập nhật sản phẩm.");</script>';
+                    header("Location: products_manage.php");
+                    exit();
+                }
             }
         } catch (PDOException $e) {
             echo '<script>alert("Có lỗi xảy ra: ' . $e->getMessage() . '");</script>';
@@ -88,104 +109,97 @@ if (isset($_GET['product_id'])) {
     }
 }
 ?>
+<?php include '../include/header.html'; ?>
+<title>Chỉnh sửa sản phẩm</title>
+<!-- Nav 1 -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-lg">
+        <a class="navbar-brand p-1" href="#">
+            <img id="logo" src="../asset/icon/icon.png" alt="Logo">
+        </a>
+        <div class="d-flex justify-content-between">
+            <div class="dropdown pt-3">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?php
+                    echo "<span style='color: black;'>Xin chào, " . $user['username'] . "!</span>__";
+                    ?>
 
-<!DOCTYPE html>
-<html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh sửa sản phẩm</title>
-    <link rel="icon" type="image/png" href="../asset/icon/favicon.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
-    <script src="../asset/script.js"></script>
-    <link rel="stylesheet" href="../asset/style.css">
-</head>
-
-<body>
-    <!-- Nav 1 -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-lg">
-            <a class="navbar-brand p-1" href="#">
-                <img id="logo" src="../asset/icon/icon.png" alt="Logo">
-            </a>
-
-            <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <?php
-                        if (isset($_SESSION['username'])) {
-                            echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
-                        }
-                        ?>
-
-                        <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
-                            class="rounded-circle">
-                    </a>
-                    <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="account.php">Tài khoản</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="products_manage.php">Quay lại</a></li>
-                        <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
-                    </ul>
-                </div>
+                    <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
+                        class="rounded-circle">
+                </a>
+                <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
+                    <li><a class="dropdown-item" href="admin.php">Trang chủ</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
+                </ul>
             </div>
         </div>
-    </nav>
-    <!-- End Nav 1 -->
-
-    <div class="container">
-        <div class="form-container">
-            <form method="post" id="form_edit_product" enctype="multipart/form-data">
-                <div class="title-image mb-3">
-                    <img src="../asset/icon/edit_product.png" alt="Hình ảnh tiêu đề">
-                </div>
-                <div class="mb-3">
-                    <label for="category_id" class="form-label"><i class="fa-solid fa-list"></i> Danh mục:</label>
-                    <select class="form-control" id="category_id" name="category_id" required>
-                        <option value="">Chọn danh mục</option>
-                        <?php
-                        $categorySql = "SELECT id_category, name_category FROM category";
-                        $categoryResult = $pdo->query($categorySql);
-
-                        while ($row = $categoryResult->fetch(PDO::FETCH_ASSOC)) {
-                            $categoryId = $row['id_category'];
-                            $categoryName = $row['name_category'];
-                            $selected = ($categoryId == $product['id_category']) ? "selected" : "";
-                            echo "<option value='$categoryId' $selected>$categoryName</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="product_name" class="form-label"><i class="fa-solid fa-file"></i> Tên sản phẩm:</label>
-                    <input type="text" class="form-control" id="product_name" name="product_name"
-                        value="<?php echo $product['product_name']; ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="product_img" class="form-label"><i class="fa-solid fa-image"></i> Hình ảnh sản phẩm:</label>
-                    <input type="file" class="form-control" id="product_img" name="product_img" accept="image/*">
-                    <input type="hidden" name="existing_product_img" value="<?php echo $product['product_img']; ?>">
-                </div>
-                <div class="mb-3">
-                    <label for="product_price" class="form-label"><i class="fa-solid fa-dollar-sign"></i> Giá sản phẩm:</label>
-                    <input type="text" class="form-control" id="product_price" name="product_price"
-                        value="<?php echo $product['product_price']; ?>" required>
-                </div>
-                <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
-                <div class="mb-3 center-button">
-                    <button type="submit" name="edit_product" class="btn btn-primary">Lưu thay đổi</button>
-                </div>
-            </form>
-        </div>
     </div>
+</nav>
+<!-- End Nav 1 -->
+<!-- Form -->
+<div class="container">
+    <div class="form-container">
+        <form method="post" id="form_edit_product" enctype="multipart/form-data">
+            <div class="title-image mb-3">
+                <img src="../asset/icon/edit_product.png" alt="Hình ảnh tiêu đề">
+            </div>
+            <div class="mb-3">
+                <label for="category_id" class="form-label"><i class="fa-solid fa-list"></i> Danh mục:</label>
+                <select class="form-control" id="category_id" name="category_id" required>
+                    <option value="">Chọn danh mục</option>
+                    <?php
+                    $categorySql = "SELECT id_category, name_category FROM category";
+                    $categoryResult = $pdo->query($categorySql);
+
+                    while ($row = $categoryResult->fetch(PDO::FETCH_ASSOC)) {
+                        $categoryId = $row['id_category'];
+                        $categoryName = $row['name_category'];
+                        $selected = ($categoryId == $product['id_category']) ? "selected" : "";
+                        echo "<option value='$categoryId' $selected>$categoryName</option>";
+                    }
+                    ?>
+                </select>
+                <span class="error">
+                    <?php echo $category_error; ?>
+                </span>
+            </div>
+            <div class="mb-3">
+                <label for="product_name" class="form-label"><i class="fa-solid fa-file"></i> Tên sản phẩm:</label>
+                <input type="text" class="form-control" id="product_name" name="product_name"
+                    value="<?php echo $product['product_name']; ?>" required>
+                <span class="error">
+                    <?php echo $name_error; ?>
+                </span>
+            </div>
+            <div class="mb-3">
+                <label for="product_img" class="form-label"><i class="fa-solid fa-image"></i> Hình ảnh sản phẩm:</label>
+                <input type="file" class="form-control" id="product_img" name="product_img" accept="image/*">
+                <input type="hidden" name="existing_product_img" value="<?php echo $product['product_img']; ?>">
+                <span class="error">
+                    <?php echo $img_error; ?>
+                </span>
+            </div>
+            <div class="mb-3">
+                <label for="product_price" class="form-label"><i class="fa-solid fa-dollar-sign"></i> Giá sản
+                    phẩm:</label>
+                <input type="text" class="form-control" id="product_price" name="product_price"
+                    value="<?php echo $product['product_price']; ?>" required>
+                <span class="error">
+                    <?php echo $price_error; ?>
+                </span>
+            </div>
+            <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+            <div class="mb-3 center-button">
+                <button type="submit" name="edit_product" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- End Form -->
 </body>
 
 </html>

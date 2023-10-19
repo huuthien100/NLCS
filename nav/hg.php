@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../view/connect.php';
+require '../view/connect.php'; // Assuming this includes your database connection
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     header("Location: login.php");
@@ -12,6 +12,7 @@ $categoryName = isset($_GET['category_name']) ? $_GET['category_name'] : "HG";
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Use prepared statements
     $sql = "SELECT p.product_name, p.product_img, p.product_price, c.name_category 
             FROM products p
             INNER JOIN category c ON p.id_category = c.id_category
@@ -21,28 +22,31 @@ try {
     $stmt->bindParam(':categoryName', $categoryName, PDO::PARAM_STR);
     $stmt->execute();
     $productInformation = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $userEmail = $_SESSION['email'];
+
+    // Use prepared statements for user query
+    $query = "SELECT access FROM users WHERE email = :email";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $access = $user['access'];
+    
+    // Function to get categories
+    function getCategories($pdo) {
+        $query = "SELECT * FROM category";
+        $stmt = $pdo->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $categories = getCategories($pdo);
 } catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    error_log("Database Error: " . $e->getMessage());
+    header("Location: ../view/error.php");
+    exit;
 }
-
-$userEmail = $_SESSION['email'];
-$query = "SELECT access FROM users WHERE email = :email";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
-$stmt->execute();
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$access = $user['access'];
-
-function getCategories($pdo)
-{
-    $query = "SELECT * FROM category";
-    $stmt = $pdo->query($query);
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-$categories = getCategories($pdo);
 ?>
 
 <!DOCTYPE html>

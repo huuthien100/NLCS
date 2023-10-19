@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'connect.php';
+require '../include/connect.php';
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     header("Location: login.php");

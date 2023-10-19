@@ -35,33 +35,6 @@
         </header>
         <!-- End Nav1 -->
 
-        <div style="height: 2.5px;"></div>
         
-        <footer>
-            <div class="container">
-                <div class="row">
-                    <!-- Address -->
-                    <div class="col address"><a href="index.html"><img src="asset/icon/icon.png" alt=""
-                                style="width: 300px; margin-left: -25px;"></a>
-                        <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
-                    </div>
-                    <!-- End Address -->
-
-                    <!-- Contact -->
-                    <div class="col contact text-end">
-                        <a href="https://facebook.com" target="_blank"><i class="icon fa-brands fa-facebook"></i></a>
-                        <a href="https://tiktok.com" target="_blank"><i class="icon fa-brands fa-tiktok"></i></a>
-                        <a href="https://youtube.com" target="_blank"><i class="icon fa-brands fa-youtube"></i></a>
-                        <a href="https://twitter.com" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                        <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                        <p>Liên hệ để được tư vấn miễn phí.</p>
-                    </div>
-                    <!-- End Contact -->
-                </div>
-            </div>
-        </footer>
-
-    </div>
-</body>
 
 </html>
