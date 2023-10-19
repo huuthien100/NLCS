@@ -137,14 +137,11 @@ try {
                                 echo "<tr>";
                                 echo "<td>" . $user['username'] . "</td>";
                                 echo "<td>" . $user['email'] . "</td>";
-                                echo "<td>
-                                <a href='edit_users.php?username=" . $user['username'] . "' class='btn btn-primary'>Edit <i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
-                                <button type='button' class='btn btn-danger delete-user' data-username='" . $user['username'] . "'>Delete <i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
-
-                                <form method='post' class='delete-user-form' data-username='" . $user['username'] . "'>
-                                    <input type='hidden' name='delete_user' value='" . $user['username'] . "'>
-                                </form>
-                                </td>";
+                                echo "<td>";
+                                echo "<a href='edit_users.php?username=" . $user['username'] . "' class='btn btn-primary'>Edit <i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>"; 
+                                echo "<span> </span>";
+                                echo "<button type='button' class='btn btn-danger delete-user' data-username='" . $user['username'] . "'>Delete <i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>";
+                                echo "</td>";
                                 echo "</tr>";
                             }
                         }

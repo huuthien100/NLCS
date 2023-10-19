@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'connect.php';
+include '../include/connect.php';
 
 $login_error = '';
 $password_error = '';
