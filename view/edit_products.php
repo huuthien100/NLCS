@@ -2,6 +2,17 @@
 require '../include/connect.php';
 require '../include/user_session.php';
 
+function getCategoryName($pdo, $category_id)
+{
+    $query = "SELECT name_category FROM category WHERE id_category = :category_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":category_id", $category_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? $row['name_category'] : false;
+}
+
+
 function isProductNameExistsInCategory($pdo, $product_name, $category_id, $product_id)
 {
     $check_name_query = "SELECT product_name FROM products WHERE product_name = :product_name AND id_category = :category_id AND id_product <> :product_id";
@@ -34,11 +45,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } elseif (isProductNameExistsInCategory($pdo, $product_name, $category_id, $product_id)) {
                 $name_error = "<span style='color: red;'>Tên sản phẩm đã tồn tại trong danh mục này.</span>";
             }
-
+            
             if (isset($_FILES["product_img"]) && $_FILES["product_img"]["error"] === UPLOAD_ERR_OK) {
                 $tmp_name = $_FILES["product_img"]["tmp_name"];
                 $file_name = $_FILES["product_img"]["name"];
-                $upload_dir = "../asset/product_img/";
+
+                $folder_name = preg_replace('/ \(\d+\)\.jpg/', '', $file_name);
+
+                $category_name = getCategoryName($pdo, $category_id);
+                $upload_dir = "../asset/product/$category_name/$folder_name/";
 
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
@@ -109,7 +124,7 @@ if (isset($_GET['product_id'])) {
     }
 }
 ?>
-<?php include '../include/header.html'; ?>
+<?php include '../include/header-ad.php'; ?>
 <title>Chỉnh sửa sản phẩm</title>
 
 <!-- Form -->

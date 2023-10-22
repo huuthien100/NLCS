@@ -12,19 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <script src="../../asset/script.js"></script>
-    <title>
-    <?php
-    $formattedCategoryName = htmlspecialchars($categoryName);
-
-    if (strlen($categoryName) > 2) {
-        $formattedCategoryName = ucwords($formattedCategoryName);
-    } else {
-        $formattedCategoryName = strtoupper($formattedCategoryName);
-    }
-
-    echo $formattedCategoryName;
-    ?>
-</title>
+    
 </head>
 
 <body>
@@ -56,7 +44,7 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="../view/logout.php">Đăng xuất</a></li>
+                    <li><a class="dropdown-item" href="../../view/logout.php">Đăng xuất</a></li>
                 </ul>
             </div>
         </div>

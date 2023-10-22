@@ -7,7 +7,7 @@ $categoryName = isset($_GET['category']) ? $_GET['category'] : pathinfo(basename
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $sql = "SELECT p.product_name, p.product_img, p.product_price, c.name_category 
+    $sql = "SELECT p.product_name, p.product_img, p.product_price, c.name_category,p.id_product
             FROM products p
             INNER JOIN category c ON p.id_category = c.id_category
             WHERE c.name_category = :categoryName";
@@ -91,15 +91,15 @@ try {
                 <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 10000;">
                     <?php
                     if ($access == 0) {
-                        echo '<li><a class="dropdown-item" href="../view/admin.php">Quản lý</a></li>';
+                        echo '<li><a class="dropdown-item" href="admin.php">Quản lý</a></li>';
                     } else if ($access == 1) {
-                        echo '<li><a class="dropdown-item" href="../view/account.php">Tài khoản</a></li>';
+                        echo '<li><a class="dropdown-item" href="account.php">Tài khoản</a></li>';
                     }
                     ?>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="view/logout.php">Đăng xuất</a></li>
+                    <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
                 </ul>
             </div>
         </div>
@@ -155,15 +155,15 @@ try {
                 if (isset($productInformation) && is_array($productInformation)) {
                     foreach ($productInformation as $proinf) {
                         echo '<div class="col-md-4 mt-3 col-sm-6">
-                            <div class="card">
-                                <img src="' . $proinf["product_img"] . '" class="card-img-top p-3" alt="' . $proinf["product_name"] . '">
-                                <div class="card-body">
-                                    <h5 class="card-title">' . $proinf["product_name"] . '</h5>
-                                    <p class="card-text">' . number_format($proinf["product_price"], 0, '', '.') . ' VNĐ</p>
-                                    <a href="../product_detail/' . strtolower($proinf['name_category']) . '/' . strtolower($proinf['name_category']) . '-' . str_replace(' ', '_', $proinf["product_name"]) . '.php" class="btn btn-danger">Xem chi tiết</a>
-                                </div>
+                        <div class="card">
+                            <img src="' . $proinf["product_img"] . '" class="card-img-top p-3" alt="' . $proinf["product_name"] . '">
+                            <div class="card-body">
+                                <h5 class="card-title">' . $proinf["product_name"] . '</h5>
+                                <p class="card-text">' . number_format($proinf["product_price"], 0, '', '.') . ' VNĐ</p>
+                                <a href="../product_detail/' . strtolower($proinf['name_category']) . '/' . strtolower($proinf['name_category']) . '-' . str_replace(' ', '_', $proinf["product_name"]) . '.php?id_product=' . $proinf["id_product"] . '" class="btn btn-danger">Xem chi tiết</a>
                             </div>
-                        </div>';
+                        </div>
+                    </div>';
                     }
                 }
                 ?>

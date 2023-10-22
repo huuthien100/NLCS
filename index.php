@@ -258,7 +258,7 @@ $categories = getCategoriesWithProductCount($pdo);
             <div class="row">
                 <!-- Address -->
                 <div class="col-6 pt-2 ps-5"><a href="#"><img src="asset/icon/icon.png" alt=""
-                            style="width: 250px; margin-left: -25px;"></a>
+                            style="width: 250px;"></a>
                     <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
                 </div>
                 <!-- End Address -->

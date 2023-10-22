@@ -11,7 +11,7 @@ include '../include/header.php';
             <div class="title-image m-3">
                 <img src="../asset/icon/account.png" alt="Hình ảnh tiêu đề">
             </div>
-            <div class="mb-3">
+            <div class="mbs-3">
                 <label for="username" class="form-label"><i class="fa-solid fa-user"></i> Tên người dùng:</label>
                 <input type="text" class="form-control" id="username" name="username"
                     value="<?php echo $user['username']; ?>" readonly>

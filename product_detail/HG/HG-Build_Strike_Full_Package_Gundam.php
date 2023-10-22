@@ -1,109 +1,70 @@
 <?php
 require '../../include/connect.php';
 require '../../include/user_session.php';
-$categoryName = isset($_GET['category']) ? $_GET['category'] : pathinfo(basename($_SERVER['PHP_SELF']), PATHINFO_FILENAME);
 
-try {
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+if (isset($_GET['id_product'])) {
+    $id_product = $_GET['id_product'];
 
-    $sql = "SELECT p.product_name, p.product_img, p.product_price, c.name_category 
-            FROM products p
-            INNER JOIN category c ON p.id_category = c.id_category
-            WHERE c.name_category = :categoryName";
+    try {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':categoryName', $categoryName, PDO::PARAM_STR);
-    $stmt->execute();
-    $productInformation = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sql = "SELECT p.product_name, p.product_price, c.name_category, p.product_img
+                FROM products p
+                INNER JOIN category c ON p.id_category = c.id_category
+                WHERE p.id_product = :id_product";
 
-    $userEmail = $_SESSION['email'];
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
+        $stmt->execute();
+        $productInformation = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $query = "SELECT access FROM users WHERE email = :email";
-    $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
-    $stmt->execute();
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $userEmail = $_SESSION['email'];
 
-    $access = $user['access'];
+        $query = "SELECT access FROM users WHERE email = :email";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    function getCategories($pdo)
-    {
-        $query = "SELECT * FROM category";
-        $stmt = $pdo->query($query);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $access = $user['access'];
+
+        function getCategories($pdo)
+        {
+            $query = "SELECT * FROM category";
+            $stmt = $pdo->query($query);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        $categories = getCategories($pdo);
+    } catch (PDOException $e) {
+        error_log("Database Error: " . $e->getMessage());
+        header("Location: ../../view/error.php");
+        exit;
     }
-
-    $categories = getCategories($pdo);
-} catch (PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
-    header("Location: ../view/error.php");
-    exit;
+} else {
+    echo "Không có ID.";
 }
+include '../../include/header-pd.php';
 ?>
-
-<?php include '../../include/header-pd.php'; ?>
 
 <div class="container-lg mt-3">
     <!-- Main Content -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
-            <!-- Carousel -->
-            <div id="productCarousel" class="carousel slide" data-bs-ride="productCarousel">
-
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (1).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 1">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (2).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 2">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (3).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 3">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (4).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 4">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (5).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 5">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (6).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 6">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (7).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 7">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (8).jpg"
-                            class="d-block w-100" alt="Ảnh sản phẩm 8">
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel"
-                    data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel"
-                    data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
+            <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (1).jpg"
+                class="d-block w-100" alt="Ảnh sản phẩm 1">
         </div>
-        <!-- End Carousel -->
         <div class="col-lg-6 col-md-6">
             <div class="row">
                 <div class="col-lg-12 col-md-12">
-                    <h1 id="product_name">Build Strike Full Package Gundam</h1>
+                    <h1 id="product_name">
+                        <?php echo $productInformation['product_name']; ?>
+                    </h1>
                 </div>
                 <div class="col-lg-12 col-md-12">
-                    <span class="badge bg-primary" id="category">HG</span>
+                    <span class="badge bg-primary" id="category">
+                        <?php echo $productInformation['name_category']; ?>
+                    </span>
                 </div>
             </div>
 
@@ -119,7 +80,9 @@ try {
 
             <div class="row">
                 <div class="col-lg-12 col-md-12 bottom-rule">
-                    <h2 class="product-price" style="color: red;">670,000 VNĐ</h2>
+                    <h2 class="product-price" style="color: red;">
+                        <?php echo number_format($productInformation['product_price']); ?> VNĐ
+                    </h2>
                 </div>
             </div>
             <hr>
@@ -280,17 +243,17 @@ try {
 </div>
 <!-- Footer -->
 <footer>
-    <div class="container mt-1">
+    <div class="container-fluid">
         <div class="row">
             <!-- Address -->
-            <div class="col address"><a href="#"><img src="../../asset/icon/icon.png" alt=""
-                        style="width: 300px; margin-left: -25px;"></a>
+            <div class="col-6 pt-2 ps-5"><a href="#"><img src="../../asset/icon/icon.png" alt=""
+                        style="width: 250px;"></a>
                 <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
             </div>
             <!-- End Address -->
 
             <!-- Contact -->
-            <div class="col contact text-end">
+            <div class="col-6 text-end pt-5 mt-3 pe-5">
                 <a href="https://facebook.com" target="_blank"><i class="icon fa-brands fa-facebook"></i></a>
                 <a href="https://tiktok.com" target="_blank"><i class="icon fa-brands fa-tiktok"></i></a>
                 <a href="https://youtube.com" target="_blank"><i class="icon fa-brands fa-youtube"></i></a>
