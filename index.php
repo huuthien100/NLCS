@@ -143,16 +143,19 @@ $categories = getCategoriesWithProductCount($pdo);
                         <ul class="dropdown-menu">
                             <?php
                             foreach ($categories as $category) {
-                                echo '<a class="dropdown-item" href="nav/' . strtolower($category['name_category']) . '.php">' . $category['name_category'] . '</a>';
+                                $categoryName = strtolower($category['name_category']);
+                                if ($categoryName !== 'tool' && $categoryName !== 'base') {
+                                    echo '<a class="dropdown-item" href="view/products.php?category=' . $categoryName . '">' . $category['name_category'] . '</a>';
+                                }
                             }
                             ?>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="nav/tool.php">Tool</a>
+                        <a class="nav-link" href="view/products.php?category=tool">Tool</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="nav/base.php">Base</a>
+                        <a class="nav-link" href="view/products.php?category=base">Base</a>
                     </li>
                 </ul>
             </div>
@@ -172,11 +175,12 @@ $categories = getCategoriesWithProductCount($pdo);
                 <div class="list-group mt-1">
                     <?php
                     foreach ($categories as $category) {
-                        echo '<a href="nav/' . strtolower($category['name_category']) . '.php" class="list-group-item d-flex justify-content-between align-items-center">' . $category['name_category'] . '<span class="badge bg-primary rounded-pill">' . $category['product_count'] . '</span></a>';
+                        echo '<a href="view/products.php?category=' . strtolower($category['name_category']) . '" class="list-group-item d-flex justify-content-between align-items-center">' . $category['name_category'] . '<span class="badge bg-primary rounded-pill">' . $category['product_count'] . '</span></a>';
                     }
                     ?>
                 </div>
                 <!-- End Listgroup Category -->
+
             </div>
             <div class="col-md-10">
                 <!-- Carousel -->
@@ -217,11 +221,7 @@ $categories = getCategoriesWithProductCount($pdo);
                     <?php
                     foreach ($productsByCategory as $category => $products) {
                         echo '<div class="row">';
-
-                        // Trộn sản phẩm
                         shuffle($products);
-
-                        // Giới hạn 3 sản phẩm
                         $randomProducts = array_slice($products, 0, 3);
 
                         foreach ($randomProducts as $product) {
@@ -247,18 +247,18 @@ $categories = getCategoriesWithProductCount($pdo);
         </div>
     </div>
     <!-- End Body -->
-    <!-- Footer -->
     <footer>
-        <div class="container-lg">
+        <div class="container-fluid">
             <div class="row">
                 <!-- Address -->
-                <div class="col address"><a href="#"><img src="asset/icon/icon.png" alt="icon.png"
-                            style="width: 300px; margin-left: -25px;"></a>
+                <div class="col-6 pt-2 ps-5"><a href="#"><img src="asset/icon/icon.png" alt=""
+                            style="width: 250px; margin-left: -25px;"></a>
                     <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
                 </div>
                 <!-- End Address -->
+
                 <!-- Contact -->
-                <div class="col contact text-end">
+                <div class="col-6 text-end pt-5 mt-3 pe-5">
                     <a href="https://facebook.com" target="_blank"><i class="icon fa-brands fa-facebook"></i></a>
                     <a href="https://tiktok.com" target="_blank"><i class="icon fa-brands fa-tiktok"></i></a>
                     <a href="https://youtube.com" target="_blank"><i class="icon fa-brands fa-youtube"></i></a>
@@ -270,7 +270,6 @@ $categories = getCategoriesWithProductCount($pdo);
             </div>
         </div>
     </footer>
-    <!-- End Footer -->
 </body>
 
 </html>

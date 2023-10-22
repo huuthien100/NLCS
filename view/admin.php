@@ -47,7 +47,7 @@ try {
                 <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
             </a>
             <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 10000;">
-                <li><a class="dropdown-item" href="admin.php">Trang quản lý</a></li>
+                <li><a class="dropdown-item" href="../index.php">Trang chủ</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
