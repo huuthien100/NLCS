@@ -1,6 +1,6 @@
 <?php
-session_start();
 require '../include/connect.php';
+require '../include/user_session.php';
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     header("Location: login.php");
@@ -36,24 +36,8 @@ try {
     echo "Error: " . $e->getMessage();
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý sản phẩm</title>
-    <link rel="icon" type="image/png" href="../asset/icon/favicon.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="../asset/style.css">
-    <script src="../asset/script.js"></script>
-</head>
-
-<body>
+<?php include '../include/header.html'; ?>
+<title>Quản lý sản phẩm</title>
     <!-- Nav 1 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-lg">
@@ -148,8 +132,8 @@ try {
                                 echo "<td><img src='" . $product['product_img'] . "' alt='" . $product['product_name'] . "' width='200' height='200'></td>";
                                 echo "<td>" . number_format($product['product_price'], 0, '', '.') . " VNĐ</td>";
                                 echo "<td>
-                                    <a href='edit_products.php?product_id=" . $product['id_product'] . "' class='btn btn-primary'>Edit <i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
-                                    <button type='button' class='btn btn-danger delete-product' data-product-id='" . $product['id_product'] . "'>Delete <i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
+                                    <a href='edit_products.php?product_id=" . $product['id_product'] . "' class='btn btn-primary'><i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
+                                    <button type='button' class='btn btn-danger delete-product' data-product-id='" . $product['id_product'] . "'><i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
 
                                     <form method='post' class='delete-product-form' data-product-id='" . $product['id_product'] . "'>
                                         <input type='hidden' name='delete_product' value='" . $product['id_product'] . "'>
@@ -196,6 +180,12 @@ try {
 
                 $("#confirmDeleteProductModal").modal("show");
             });
+
+            $(document).on("keypress", function (e) {
+            if (e.key === "Enter") {
+                $("#confirmDeleteProductButton").click();
+            }
+        });
 
             $("#confirmDeleteProductButton").on("click", function () {
                 var productId = $(this).data("product-id");

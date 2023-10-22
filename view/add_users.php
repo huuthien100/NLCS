@@ -59,7 +59,7 @@ if (isset($_POST['submit'])) {
 
 ?>
 <?php include '../include/header.html'; ?>
-<title>Thêm người dùng</title>
+<title>Thêm thành viên</title>
 <!-- Nav 1 -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-lg">

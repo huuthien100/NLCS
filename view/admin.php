@@ -29,7 +29,7 @@ try {
 }
 ?>
 <?php include '../include/header.html'; ?>
-<title>Trang quản lý</title>
+<title>Trang chủ quản lý</title>
 <!-- Nav 1 -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-lg">

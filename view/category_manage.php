@@ -49,7 +49,7 @@ try {
                         class="rounded-circle">
                 </a>
                 <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                    <li><a class="dropdown-item" href="../admin.php">Trang sản phẩm</a></li>
+                    <li><a class="dropdown-item" href="../index.php">Trang sản phẩm</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -117,8 +117,8 @@ try {
                             echo "<tr>";
                             echo "<td>" . $category['name_category'] . "</td>";
                             echo "<td>
-                                <a href='edit_category.php?category_id=" . $category['id_category'] . "' class='btn btn-primary'>Edit <i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
-                                <button type='button' class='btn btn-danger delete-category' data-category-id='" . $category['id_category'] . "'>Delete <i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
+                                <a href='edit_category.php?category_id=" . $category['id_category'] . "' class='btn btn-primary'><i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
+                                <button type='button' class='btn btn-danger delete-category' data-category-id='" . $category['id_category'] . "'><i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
                                 
                                 <form method='post' class='delete-category-form' data-category-id='" . $category['id_category'] . "'>
                                     <input type='hidden' name='delete_category' value='" . $category['id_category'] . "'>
@@ -165,6 +165,12 @@ try {
             $("#confirmDeleteButton").data("category-id", categoryId);
 
             $("#confirmDeleteModal").modal("show");
+        });
+
+        $(document).on("keypress", function (e) {
+            if (e.key === "Enter") {
+                $("#confirmDeleteButton").click();
+            }
         });
 
         $("#confirmDeleteButton").on("click", function () {

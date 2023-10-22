@@ -51,7 +51,6 @@ if (isset($_POST['submit'])) {
             $updateStmt->bindParam(':currentUsername', $username);
 
             if ($updateStmt->execute()) {
-                // Check if a new password is provided
                 if (!empty($newPassword)) {
                     $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
                     $passwordUpdateQuery = "UPDATE users SET password = :password WHERE username = :currentUsername";
@@ -79,7 +78,7 @@ $userData = $selectStmt->fetch();
 
 ?>
 <?php include '../include/header.html'; ?>
-<title>Chỉnh sửa người dùng</title>
+<title>Chỉnh sửa thành viên</title>
 <!-- Nav 1 -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-lg">
@@ -111,27 +110,31 @@ $userData = $selectStmt->fetch();
 <!-- End Nav 1 -->
 <div class="container mb-5">
     <div class="form-container">
-        <form name="form_edit_user" id="form_edit_user" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . '?username=' . $username); ?>" method="POST">
+        <form name="form_edit_user" id="form_edit_user"
+            action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . '?username=' . $username); ?>" method="POST">
             <div class="title-image mb-3">
                 <img src="../asset/icon/edit_user.png" alt="Hình ảnh tiêu đề">
             </div>
             <div class="mb-3">
                 <label for="username" class="form-label"><i class="fa-solid fa-user"></i> Tên người dùng:</label>
-                <input type="text" class="form-control" id="username" name="username" value="<?php echo $userData['username']; ?>" required>
+                <input type="text" class="form-control" id="username" name="username"
+                    value="<?php echo $userData['username']; ?>" required>
                 <span class="error">
                     <?php echo $name_error; ?>
                 </span>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label"><i class="fa-solid fa-envelope"></i> Email:</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?php echo $userData['email']; ?>" required>
+                <input type="email" class="form-control" id="email" name="email"
+                    value="<?php echo $userData['email']; ?>" required>
                 <span class="error">
                     <?php echo $email_error; ?>
                 </span>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label"><i class="fa-solid fa-key"></i> Mật khẩu:</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Để trống nếu không muốn thay đổi">
+                <input type="password" class="form-control" id="password" name="password"
+                    placeholder="Để trống nếu không muốn thay đổi">
                 <span class="error">
                     <?php echo $password_error; ?>
                 </span>
@@ -139,8 +142,10 @@ $userData = $selectStmt->fetch();
             <div class="mb-3">
                 <label for="userRole" class="form-label"><i class="fa-solid fa-users"></i> Vai trò:</label>
                 <select class="form-control" id="userRole" name="userRole" required>
-                    <option value="0" <?php if ($userData['access'] == 0) echo "selected"; ?>>Admin</option>
-                    <option value="1" <?php if ($userData['access'] == 1) echo "selected"; ?>>User</option>
+                    <option value="0" <?php if ($userData['access'] == 0)
+                        echo "selected"; ?>>Admin</option>
+                    <option value="1" <?php if ($userData['access'] == 1)
+                        echo "selected"; ?>>User</option>
                 </select>
             </div>
             <div class="mb-3 center-button">
@@ -192,4 +197,5 @@ $userData = $selectStmt->fetch();
     });
 </script>
 </body>
+
 </html>
