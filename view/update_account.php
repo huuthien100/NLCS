@@ -55,137 +55,132 @@ if (isset($_POST['submit'])) {
 ?>
 <?php include '../include/header.html'; ?>
 <title>Tài khoản</title>
-    <!-- Nav 1 -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-lg">
-            <a class="navbar-brand p-1" href="#">
-                <img id="logo" src="../asset/icon/icon.png" alt="Logo">
+<!-- Nav 1 -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="../index.php">
+            <img id="logo" src="../asset/icon/icon.png" alt="Logo" class="ms-5">
+        </a>
+        <div class="dropdown pt-3">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle me-4"
+                id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <?php
+                if (isset($_SESSION['username'])) {
+                    echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
+                }
+                ?>
+                <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
             </a>
-
-            <div class="d-flex justify-content-between">
-                <div class="dropdown pt-3" style="margin-left: 930px;">
-                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <?php
-                        if (isset($_SESSION['username'])) {
-                            echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
-                        }
-                        ?>
-
-                        <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
-                            class="rounded-circle">
-                    </a>
-                    <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                        <li><a class="dropdown-item" href="../index.php">Trang chủ</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>   
-                        <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <!-- End Nav 1 -->
-
-    <div class="container">
-        <div class="form-container mb-5">
-            <form name="form_account" id="form_account" action="update_account.php" method="POST">
-                <div class="title-image mb-3">
-                    <img src="../asset/icon/account.png" alt="Hình ảnh tiêu đề">
-                </div>
-                <div class="mb-3">
-                    <label for="newUsername" class="form-label"><i class="fa-solid fa-user"></i> Tên người dùng
-                        mới:</label>
-                    <input type="text" class="form-control" id="newUsername" name="newUsername"
-                        value="<?php echo $_SESSION['username']; ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="newEmail" class="form-label"><i class="fa-solid fa-envelope"></i> Email mới:</label>
-                    <input type="text" class="form-control" id="newEmail" name="newEmail"
-                        value="<?php echo $_SESSION['email']; ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="newPassword" class="form-label"><i class="fa-solid fa-key"></i> Mật khẩu mới:</label>
-                    <input type="password" class="form-control" id="newPassword" name="newPassword"
-                        placeholder="Nhập mật khẩu mới">
-                </div>
-                <div class="mb-3">
-                    <label for="newPassword" class="form-label"><i class="fa-solid fa-key"></i> Nhập lại mật khẩu
-                        mới:</label>
-                    <input type="password" class="form-control" id="renewPassword" name="renewPassword"
-                        placeholder="Nhập lại mật khẩu mới">
-                </div>
-
-                <div class="mb-3 center-button">
-                    <button type="submit" name="submit" class="btn btn-success">Cập nhật</button>
-                </div>
-            </form>
+            <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 10000;">
+                <li><a class="dropdown-item" href="admin.php">Trang quản lý</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
+            </ul>
         </div>
     </div>
-    <script>
-        $.validator.addMethod(
-            "customPassword",
-            function (value, element) {
-                return /^(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]).*$/.test(value);
-            },
-            "Mật khẩu phải chứa ít nhất 1 chữ cái và 1 ký tự đặc biệt"
-        );
+</nav>
+<!-- End Nav 1 -->
 
-        $("#form_account").validate({
-            rules: {
-                newUsername: {
-                    required: true,
-                    minlength: 2,
-                },
-                newEmail: {
-                    required: true,
-                    email: true,
-                },
-                newPassword: {
-                    required: true,
-                    minlength: 6,
-                    customPassword: true,
-                },
-                renewPassword: {
-                    required: true,
-                    minlength: 6,
-                    equalTo: "#newPassword",
-                },
+<div class="container">
+    <div class="form-container mb-5">
+        <form name="form_account" id="form_account" action="update_account.php" method="POST">
+            <div class="title-image mb-3">
+                <img src="../asset/icon/account.png" alt="Hình ảnh tiêu đề">
+            </div>
+            <div class="mb-3">
+                <label for="newUsername" class="form-label"><i class="fa-solid fa-user"></i> Tên người dùng
+                    mới:</label>
+                <input type="text" class="form-control" id="newUsername" name="newUsername"
+                    value="<?php echo $_SESSION['username']; ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="newEmail" class="form-label"><i class="fa-solid fa-envelope"></i> Email mới:</label>
+                <input type="text" class="form-control" id="newEmail" name="newEmail"
+                    value="<?php echo $_SESSION['email']; ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="newPassword" class="form-label"><i class="fa-solid fa-key"></i> Mật khẩu mới:</label>
+                <input type="password" class="form-control" id="newPassword" name="newPassword"
+                    placeholder="Nhập mật khẩu mới">
+            </div>
+            <div class="mb-3">
+                <label for="newPassword" class="form-label"><i class="fa-solid fa-key"></i> Nhập lại mật khẩu
+                    mới:</label>
+                <input type="password" class="form-control" id="renewPassword" name="renewPassword"
+                    placeholder="Nhập lại mật khẩu mới">
+            </div>
+
+            <div class="mb-3 center-button">
+                <button type="submit" name="submit" class="btn btn-success">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $.validator.addMethod(
+        "customPassword",
+        function (value, element) {
+            return /^(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]).*$/.test(value);
+        },
+        "Mật khẩu phải chứa ít nhất 1 chữ cái và 1 ký tự đặc biệt"
+    );
+
+    $("#form_account").validate({
+        rules: {
+            newUsername: {
+                required: true,
+                minlength: 2,
             },
-            messages: {
-                newUsername: {
-                    required: 'Bạn chưa nhập tên người dùng',
-                    minlength: 'Tên người dùng phải có ít nhất 2 ký tự'
-                },
-                newEmail: 'Địa chỉ Email không hợp lệ',
-                newPassword: {
-                    required: 'Bạn chưa nhập mật khẩu',
-                    minlength: 'Mật khẩu phải có ít nhất 6 ký tự'
-                },
-                renewPassword: {
-                    required: 'Bạn chưa nhập mật khẩu',
-                    minlength: 'Mật khẩu phải có ít nhất 6 ký tự',
-                    equalTo: 'Mật khẩu không trùng khớp với mật khẩu đã nhập'
-                },
+            newEmail: {
+                required: true,
+                email: true,
             },
-            errorElement: 'div',
-            errorPlacement: function (error, element) {
-                error.addClass('invalid-feedback');
-                if (element.prop('type') == 'checkbox') {
-                    error.insertAfter(element.siblings('label'));
-                } else {
-                    error.insertAfter(element);
-                }
+            newPassword: {
+                required: true,
+                minlength: 6,
+                customPassword: true,
             },
-            highlight: function (element, errorClass, validClass) {
-                $(element).addClass('is-invalid').removeClass('is-valid');
+            renewPassword: {
+                required: true,
+                minlength: 6,
+                equalTo: "#newPassword",
             },
-            unhighlight: function (element, errorClass, validClass) {
-                $(element).addClass('is-valid').removeClass('is-invalid');
+        },
+        messages: {
+            newUsername: {
+                required: 'Bạn chưa nhập tên người dùng',
+                minlength: 'Tên người dùng phải có ít nhất 2 ký tự'
             },
-        });  
-    </script>
+            newEmail: 'Địa chỉ Email không hợp lệ',
+            newPassword: {
+                required: 'Bạn chưa nhập mật khẩu',
+                minlength: 'Mật khẩu phải có ít nhất 6 ký tự'
+            },
+            renewPassword: {
+                required: 'Bạn chưa nhập mật khẩu',
+                minlength: 'Mật khẩu phải có ít nhất 6 ký tự',
+                equalTo: 'Mật khẩu không trùng khớp với mật khẩu đã nhập'
+            },
+        },
+        errorElement: 'div',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            if (element.prop('type') == 'checkbox') {
+                error.insertAfter(element.siblings('label'));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid').removeClass('is-valid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-valid').removeClass('is-invalid');
+        },
+    });  
+</script>
 </body>
 
 </html>

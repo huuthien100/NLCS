@@ -2,20 +2,21 @@
 require '../include/connect.php';
 require '../include/user_session.php';
 
-function isCategoryNameDuplicate($pdo, $categoryName, $category_id = null) {
+function isCategoryNameDuplicate($pdo, $categoryName, $category_id = null)
+{
     $query = "SELECT name_category FROM category WHERE name_category = :categoryName";
     if ($category_id !== null) {
         $query .= " AND id_category <> :category_id";
     }
-    
+
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':categoryName', $categoryName);
     if ($category_id !== null) {
         $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
     }
-    
+
     $stmt->execute();
-    
+
     return $stmt->rowCount() > 0;
 }
 
@@ -52,29 +53,27 @@ if (isset($_POST['submit'])) {
 <title>Thêm danh mục</title>
 <!-- Nav 1 -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-lg">
-        <a class="navbar-brand p-1" href="#">
-            <img id="logo" src="../asset/icon/icon.png" alt="Logo">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="../index.php">
+            <img id="logo" src="../asset/icon/icon.png" alt="Logo" class="ms-5">
         </a>
-        <div class="d-flex justify-content-between">
-            <div class="dropdown pt-3">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <?php
-                        echo "<span style='color: black;'>Xin chào, " . $user['username'] . "!</span>__";
-                    ?>
-
-                    <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
-                        class="rounded-circle">
-                </a>
-                <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 100000;">
-                    <li><a class="dropdown-item" href="admin.php">Trang chủ</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
-                </ul>
-            </div>
+        <div class="dropdown pt-3">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle me-4"
+                id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <?php
+                if (isset($_SESSION['username'])) {
+                    echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
+                }
+                ?>
+                <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
+            </a>
+            <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 10000;">
+                <li><a class="dropdown-item" href="admin.php">Trang quản lý</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
+            </ul>
         </div>
     </div>
 </nav>
@@ -82,7 +81,8 @@ if (isset($_POST['submit'])) {
 <!-- Form -->
 <div class="container">
     <div class="form-container">
-        <form name="form_add_category" id="form_add_category" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <form name="form_add_category" id="form_add_category"
+            action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <div class="title-image mb-3">
                 <img src="../asset/icon/add_category.png" alt="Hình ảnh tiêu đề" style="width: 150%">
             </div>
@@ -95,7 +95,7 @@ if (isset($_POST['submit'])) {
             <div class="mb-3 center-button">
                 <button type="submit" name="submit" class="btn btn-success">Thêm danh mục</button>
             </div>
-            <?php if (!empty($errorMsg)) : ?>
+            <?php if (!empty($errorMsg)): ?>
                 <div class="alert alert-danger" role="alert">
                     <?php echo $errorMsg; ?>
                 </div>
