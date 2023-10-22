@@ -51,9 +51,33 @@ include '../../include/header-pd.php';
     <!-- Main Content -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
-            <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (1).jpg"
-                class="d-block w-100" alt="Ảnh sản phẩm 1">
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <?php
+                    $imagePath = '../../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
+                    $images = glob($imagePath . '/*.{jpg,png,gif}', GLOB_BRACE);
+
+                    foreach ($images as $index => $image) {
+                        $activeClass = ($index === 0) ? 'active' : '';
+                        echo '<div class="carousel-item ' . $activeClass . '">
+                            <img src="' . $image . '" class="d-block w-100" alt="Ảnh sản phẩm ' . ($index + 1) . '">
+                        </div>';
+                    }
+                    ?>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel"
+                    data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel"
+                    data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
         </div>
+
         <div class="col-lg-6 col-md-6">
             <div class="row">
                 <div class="col-lg-12 col-md-12">
@@ -142,22 +166,14 @@ include '../../include/header-pd.php';
 
                     </p>
                     <div class="image-container">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (1).jpg"
-                            alt="Ảnh sản phẩm 1">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (2).jpg"
-                            alt="Ảnh sản phẩm 2">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (3).jpg"
-                            alt="Ảnh sản phẩm 3">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (4).jpg"
-                            alt="Ảnh sản phẩm 4">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (5).jpg"
-                            alt="Ảnh sản phẩm 5">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (6).jpg"
-                            alt="Ảnh sản phẩm 6">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (7).jpg"
-                            alt="Ảnh sản phẩm 7">
-                        <img src="../../asset/product/HG/HG-Build Strike Full Package Gundam/HG-Build Strike Full Package Gundam (8).jpg"
-                            alt="Ảnh sản phẩm 8">
+                        <?php
+                        $imagePath = '../../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
+                        $images = glob($imagePath . '/*.{jpg,png,gif}', GLOB_BRACE);
+
+                        foreach ($images as $index => $image) {
+                            echo '<img src="' . $image . '" alt="Ảnh sản phẩm ' . ($index + 1) . '">';
+                        }
+                        ?>
                     </div>
                 </div>
 

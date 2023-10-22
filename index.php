@@ -28,7 +28,7 @@ $access = $user['access'];
 function getProductsGroupedByCategory($pdo)
 {
     $query = "SELECT category.id_category, category.name_category, 
-              products.product_name, products.product_img, products.product_price
+              products.id_product, products.product_name, products.product_img, products.product_price
               FROM category
               LEFT JOIN products ON category.id_category = products.id_category
               ORDER BY category.id_category, products.product_name";
@@ -41,6 +41,7 @@ function getProductsGroupedByCategory($pdo)
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $category = $row['name_category'];
         $product = array(
+            'id_product' => $row['id_product'],
             'name' => $row['product_name'],
             'image' => $row['product_img'],
             'price' => $row['product_price'],
@@ -51,6 +52,7 @@ function getProductsGroupedByCategory($pdo)
 
     return $productsByCategory;
 }
+
 
 $productsByCategory = getProductsGroupedByCategory($pdo);
 
@@ -239,7 +241,7 @@ $categories = getCategoriesWithProductCount($pdo);
                                     <div class="card-body">
                                         <h5 class="card-title">' . $product['name'] . '</h5>
                                         <p class="card-text">' . number_format($product['price']) . ' VNĐ</p>
-                                        <a href="product_detail/' . strtolower($category) . '/' . strtolower($category) . '-' . str_replace(' ', '_', strtolower($product['name'])) . '.php" class="btn btn-danger">Xem chi tiết</a>
+                                        <a href="product_detail/' . strtolower($category) . '/' . strtolower($category) . '-' . str_replace(' ', '_', strtolower($product['name'])) . '.php?id_product=' . $product["id_product"] . '" class="btn btn-danger">Xem chi tiết</a>
                                     </div>
                                 </div>
                             </div>';
