@@ -1,11 +1,19 @@
 <?php
 session_start();
-
 require 'include/connect.php';
 
 if (!isset($_SESSION['email']) || !isset($_SESSION['username'])) {
     header("Location: view/login.php");
     exit;
+}
+
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+    $query = "SELECT * FROM users WHERE username = :username";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 $userEmail = $_SESSION['email'];
@@ -111,7 +119,7 @@ $categories = getCategoriesWithProductCount($pdo);
                 <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 10000;">
                     <?php
                     if ($access == 0) {
-                        echo '<li><a class="dropdown-item" href="view/admin.php">Quản lý</a></li>';
+                        echo '<li><a class="dropdown-item" href="view/admin.php">Trang quản lý</a></li>';
                     } else if ($access == 1) {
                         echo '<li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>';
                     }
@@ -167,7 +175,6 @@ $categories = getCategoriesWithProductCount($pdo);
         </div>
     </nav>
     <!-- End Nav 2 -->
-    <!-- Body -->
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2">
@@ -246,7 +253,6 @@ $categories = getCategoriesWithProductCount($pdo);
             </div>
         </div>
     </div>
-    <!-- End Body -->
     <footer>
         <div class="container-fluid">
             <div class="row">
