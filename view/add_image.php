@@ -106,7 +106,8 @@ if (isset($_GET['product_id'])) {
             }
 
             if ($success) {
-                header("Location: products_manage.php");
+                echo '<script>alert("Upload thành công!");</script>';
+                echo '<script>setTimeout(function(){ window.location.href = "products_manage.php"; }, 100);</script>';
                 exit;
             }
             
@@ -134,7 +135,6 @@ if (isset($_GET['product_id'])) {
                     <?php echo $img_error; ?>
                 </span>
             </div>
-            <?php echo $successMessage; ?>
             <div class="center-button">
                 <button type="submit" name="submit" class="btn btn-success">Thêm hình ảnh</button>
             </div>

@@ -78,7 +78,7 @@ try {
             <div class="d-flex justify-content-between">
                 <h1>Quản lý sản phẩm</h1>
                 <a href="add_products.php" class="btn btn-success pt-3">
-                    Thêm sản phẩm <i class="fa-solid fa-plus" style="color: #ffffff;"></i>
+                    Thêm sản phẩm <i class="fa-solid fa-plus" style="color: #ffffff"></i>
                 </a>
             </div>
             <table class="table table-striped">
