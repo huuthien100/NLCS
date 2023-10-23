@@ -1,7 +1,6 @@
 <?php
 require '../include/connect.php';
 require '../include/user_session.php';
-
 function getCategoryName($pdo, $category_id)
 {
     $query = "SELECT name_category FROM category WHERE id_category = :category_id";
@@ -11,7 +10,6 @@ function getCategoryName($pdo, $category_id)
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return $row ? $row['name_category'] : false;
 }
-
 
 function isProductNameExistsInCategory($pdo, $product_name, $category_id, $product_id)
 {
@@ -45,25 +43,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } elseif (isProductNameExistsInCategory($pdo, $product_name, $category_id, $product_id)) {
                 $name_error = "<span style='color: red;'>Tên sản phẩm đã tồn tại trong danh mục này.</span>";
             }
-            
+
             if (isset($_FILES["product_img"]) && $_FILES["product_img"]["error"] === UPLOAD_ERR_OK) {
                 $tmp_name = $_FILES["product_img"]["tmp_name"];
                 $file_name = $_FILES["product_img"]["name"];
 
-                $folder_name = preg_replace('/ \(\d+\)\.jpg/', '', $file_name);
-
                 $category_name = getCategoryName($pdo, $category_id);
-                $upload_dir = "../asset/product/$category_name/$folder_name/";
+                $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+
+                $new_file_name = $product_name . '-' . 1 . '.' . $file_extension;
+
+                $upload_dir = "../asset/product/$category_name/$category_name-$product_name/";
 
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
 
-                $product_img = $upload_dir . $file_name;
+                $product_img = $upload_dir . $new_file_name;
 
                 if (move_uploaded_file($tmp_name, $product_img)) {
                 } else {
-                    $img_error = "<span style='color: red;'>Không thể tải lên ảnh.</span>";
+                    $img_error = "<span style='color: red;'>Lỗi khi tải lên hình ảnh sản phẩm.</span>";
                 }
             }
 

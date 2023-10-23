@@ -1,6 +1,7 @@
 <?php
 require '../include/connect.php';
 require '../include/user_session.php';
+
 function isProductNameExistsInCategory($pdo, $product_name, $category_id)
 {
     $check_name_query = "SELECT product_name FROM products WHERE product_name = :product_name AND id_category = :category_id";
@@ -46,23 +47,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $tmp_name = $_FILES["product_img"]["tmp_name"];
         $file_name = $_FILES["product_img"]["name"];
 
-        $folder_name = preg_replace('/ \(\d+\)\.jpg/', '', $file_name);
-
         $category_name = getCategoryName($pdo, $category_id);
 
         if ($category_name) {
-            $upload_dir = "../asset/product/$category_name/$folder_name/";
+            $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+            $new_file_name = $product_name . '-' . 1 . '.' . $file_extension;
+
+            $upload_dir = "../asset/product/$category_name/$category_name-$product_name/";
 
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
 
-            $product_img = $upload_dir . $file_name;
+            $product_img = $upload_dir . $new_file_name;
 
             if (move_uploaded_file($tmp_name, $product_img)) {
             } else {
-                $img_error = "<span style='color: red;'>Bạn chưa chọn hình ảnh sản phẩm.</span>";
+                $img_error = "<span style='color: red;'>Lỗi khi tải lên hình ảnh sản phẩm.</span>";
             }
+        } else {
+            $img_error = "<span style='color: red;'>Không tìm thấy tên danh mục.</span>";
         }
     }
 
@@ -74,20 +78,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($category_error) && empty($name_error) && empty($img_error) && empty($price_error)) {
-        $sql = "INSERT INTO products (id_category, product_name, product_img, product_price) VALUES (:id_category, :product_name, :product_img, :product_price)";
+        $insertProductSql = "INSERT INTO products (id_category, product_name, product_img, product_price) VALUES (:id_category, :product_name, :product_img, :product_price)";
 
-        $addStmt = $pdo->prepare($sql);
+        $insertImgSql = "INSERT INTO product_img (id_product, img_url) VALUES (:id_product, :img_url)";
 
-        $addStmt->bindParam(":id_category", $category_id, PDO::PARAM_INT);
-        $addStmt->bindParam(":product_name", $product_name, PDO::PARAM_STR);
-        $addStmt->bindParam(":product_img", $product_img, PDO::PARAM_STR);
-        $addStmt->bindParam(":product_price", $product_price, PDO::PARAM_STR);
+        try {
+            $pdo->beginTransaction();
 
-        if ($addStmt->execute()) {
+            $insertProductStmt = $pdo->prepare($insertProductSql);
+            $insertProductStmt->bindParam(":id_category", $category_id, PDO::PARAM_INT);
+            $insertProductStmt->bindParam(":product_name", $product_name, PDO::PARAM_STR);
+            $insertProductStmt->bindParam(":product_img", $product_img, PDO::PARAM_STR);
+            $insertProductStmt->bindParam(":product_price", $product_price, PDO::PARAM_STR);
+            $insertProductStmt->execute();
+
+            $newProductId = $pdo->lastInsertId();
+
+            $insertImgStmt = $pdo->prepare($insertImgSql);
+            $insertImgStmt->bindParam(":id_product", $newProductId, PDO::PARAM_INT);
+            $insertImgStmt->bindParam(":img_url", $product_img, PDO::PARAM_STR);
+            $insertImgStmt->execute();
+
+            $pdo->commit();
+
             echo '<script>alert("Sản phẩm đã được thêm thành công.");</script>';
-            echo '<script>setTimeout(function(){ window.location.href = "products_manage.php"; }, 100);</script>';
+            echo '<script>setTimeout(function(){ window.location.href = "products_manage.php"; });</script>';
             exit();
-        } else {
+        } catch (PDOException $e) {
+            $pdo->rollBack();
             echo '<script>alert("Có lỗi xảy ra. Không thể thêm sản phẩm.");</script>';
             header("Location: products_manage.php");
             exit();

@@ -241,7 +241,7 @@ $categories = getCategoriesWithProductCount($pdo);
                                     <div class="card-body">
                                         <h5 class="card-title">' . $product['name'] . '</h5>
                                         <p class="card-text">' . number_format($product['price']) . ' VNĐ</p>
-                                        <a href="product_detail/' . strtolower($category) . '/' . strtolower($category) . '-' . str_replace(' ', '_', strtolower($product['name'])) . '.php?id_product=' . $product["id_product"] . '" class="btn btn-danger">Xem chi tiết</a>
+                                        <a href="view/product_detail.php?id_product=' . $product["id_product"] . '" class="btn btn-danger">Xem chi tiết</a>
                                     </div>
                                 </div>
                             </div>';

@@ -101,20 +101,26 @@ try {
                             echo "<td><img src='" . $product['product_img'] . "' alt='" . $product['product_name'] . "' width='200' height='200'></td>";
                             echo "<td>" . number_format($product['product_price'], 0, '', '.') . " VNĐ</td>";
                             echo "<td>
-                                        <a href='edit_products.php?product_id=" . $product['id_product'] . "' class='btn btn-primary'>
-                                            <i class='fas fa-pencil' style='color: #ffffff;'></i>
-                                        </a>
-                                        <button type='button' class='btn btn-danger delete-product' data-product-id='" . $product['id_product'] . "'>
-                                            <i class='fas fa-trash' style='color: #ffffff;'></i>
-                                        </button>
-                                        <a href='add_image.php?product_id=". $product['id_product'] ."' class='btn btn-success add-image'>
-                                            <i class='fas fa-camera'></i>
-                                        </a>
-                                        <form method='post' class='delete-product-form' data-product-id='" . $product['id_product'] . "'>
-                                            <input type='hidden' name='delete_product' value='" . $product['id_product'] . "'>
-                                        </form>
-                                    </td>";
+                                    <a href='read_product.php?product_id=" . $product['id_product'] . "' class='btn btn-info'>
+                                        <i class='fas fa-eye' style='color: #ffffff;'></i>
+                                    </a>
+                                    <a href='add_image.php?product_id=" . $product['id_product'] . "' class='btn btn-success add-image'>
+                                        <i class='fas fa-camera'></i>
+                                    </a>
+                                    <a href='edit_products.php?product_id=" . $product['id_product'] . "' class='btn btn-primary'>
+                                        <i class='fas fa-pencil' style='color: #ffffff;'></i>
+                                    </a>
+                                    
+                                    <button type='button' class='btn btn-danger delete-product' data-product-id='" . $product['id_product'] . "'>
+                                        <i class='fas fa-trash' style='color: #ffffff;'></i>
+                                    </button>
+                                    
+                                    <form method='post' class='delete-product-form' data-product-id='" . $product['id_product'] . "'>
+                                        <input type='hidden' name='delete_product' value='" . $product['id_product'] . "'>
+                                    </form>
+                                </td>";
                             echo "</tr>";
+
                         }
                     }
                     ?>
