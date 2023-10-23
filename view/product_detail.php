@@ -1,6 +1,6 @@
 <?php
-require '../../include/connect.php';
-require '../../include/user_session.php';
+require '../include/connect.php';
+require '../include/user_session.php';
 
 if (isset($_GET['id_product'])) {
     $id_product = $_GET['id_product'];
@@ -38,13 +38,13 @@ if (isset($_GET['id_product'])) {
         $categories = getCategories($pdo);
     } catch (PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
-        header("Location: ../../view/error.php");
+        header("Location: ../view/error.php");
         exit;
     }
 } else {
     echo "Không có ID.";
 }
-include '../../include/header-pd.php';
+include '../include/header-pd.php';
 ?>
 
 <div class="container-lg mt-3">
@@ -54,7 +54,7 @@ include '../../include/header-pd.php';
             <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <?php
-                    $imagePath = '../../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
+                    $imagePath = '../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
                     $images = glob($imagePath . '/*.{jpg,png,gif}', GLOB_BRACE);
 
                     foreach ($images as $index => $image) {
@@ -167,7 +167,7 @@ include '../../include/header-pd.php';
                     </p>
                     <div class="image-container">
                         <?php
-                        $imagePath = '../../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
+                        $imagePath = '../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
                         $images = glob($imagePath . '/*.{jpg,png,gif}', GLOB_BRACE);
 
                         foreach ($images as $index => $image) {
@@ -257,31 +257,7 @@ include '../../include/header-pd.php';
         <!-- End Main Content -->
     </div>
 </div>
-<!-- Footer -->
-<footer>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Address -->
-            <div class="col-6 pt-2 ps-5"><a href="#"><img src="../../asset/icon/icon.png" alt=""
-                        style="width: 250px;"></a>
-                <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
-            </div>
-            <!-- End Address -->
-
-            <!-- Contact -->
-            <div class="col-6 text-end pt-5 mt-3 pe-5">
-                <a href="https://facebook.com" target="_blank"><i class="icon fa-brands fa-facebook"></i></a>
-                <a href="https://tiktok.com" target="_blank"><i class="icon fa-brands fa-tiktok"></i></a>
-                <a href="https://youtube.com" target="_blank"><i class="icon fa-brands fa-youtube"></i></a>
-                <a href="https://twitter.com" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                <p>Liên hệ để được tư vấn miễn phí.</p>
-            </div>
-            <!-- End Contact -->
-        </div>
-    </div>
-</footer>
-<!-- End Footer -->
+<?php include('../include/footer.html'); ?>
 </body>
 
 </html>

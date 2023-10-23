@@ -160,8 +160,8 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">' . $proinf["product_name"] . '</h5>
                                 <p class="card-text">' . number_format($proinf["product_price"], 0, '', '.') . ' VNĐ</p>
-                                <a href="../product_detail/' . strtolower($proinf['name_category']) . '/' . strtolower($proinf['name_category']) . '-' . str_replace(' ', '_', $proinf["product_name"]) . '.php?id_product=' . $proinf["id_product"] . '" class="btn btn-danger">Xem chi tiết</a>
-                            </div>
+                                <a href="product_detail.php?id_product=' . $proinf["id_product"] . '" class="btn btn-danger">Xem chi tiết</a>
+                                </div>
                         </div>
                     </div>';
                     }
