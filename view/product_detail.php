@@ -46,7 +46,7 @@ if (isset($_GET['id_product'])) {
 }
 include '../include/header-pd.php';
 ?>
-
+<title><?php echo $productInformation['name_category'] . ' - ' . $productInformation['product_name']; ?></title>
 <div class="container-lg mt-3">
     <!-- Main Content -->
     <div class="row">

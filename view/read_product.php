@@ -9,22 +9,18 @@ if (isset($_GET['product_id'])) {
     $detail_data = [];
     $images = [];
 
-    // Truy vấn thông tin sản phẩm từ bảng products
     $product_query = "SELECT product_name, product_price FROM products WHERE id_product = :product_id";
     $product_stmt = $pdo->prepare($product_query);
     $product_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
 
-    // Truy vấn thông tin chi tiết sản phẩm từ bảng product_detail
-    $detail_query = "SELECT scale, detail, equipment, decal, stand, origin FROM product_detail WHERE id_product = :product_id";
+    $detail_query = "SELECT scale, detail, equipment, decal, stand, origin, description FROM product_detail WHERE id_product = :product_id";
     $detail_stmt = $pdo->prepare($detail_query);
     $detail_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
 
-    // Truy vấn danh sách ảnh sản phẩm từ bảng product_img
-    $image_query = "SELECT img_url FROM product_img WHERE id_product = :product_id";
+    $image_query = "SELECT img_id, img_url FROM product_img WHERE id_product = :product_id";
     $image_stmt = $pdo->prepare($image_query);
     $image_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
 
-    // Execute the queries and handle errors
     try {
         $product_stmt->execute();
         $product_data = $product_stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,10 +33,34 @@ if (isset($_GET['product_id'])) {
     } catch (PDOException $e) {
         echo 'Error: ' . $e->getMessage();
     }
-}
-?>
 
-<?php include '../include/header-ad.php'; ?>
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if (isset($_POST['delete_images'])) {
+            $selectedImages = isset($_POST['selected_images']) ? $_POST['selected_images'] : [];
+            if (!empty($selectedImages)) {
+                foreach ($selectedImages as $imageId) {
+                    $imageQuery = "SELECT img_url FROM product_img WHERE img_id = :img_id";
+                    $imageStmt = $pdo->prepare($imageQuery);
+                    $imageStmt->bindParam(':img_id', $imageId, PDO::PARAM_INT);
+                    $imageStmt->execute();
+                    $imageData = $imageStmt->fetch(PDO::FETCH_ASSOC);
+                    if ($imageData !== false && isset($imageData['img_url'])) {
+                        $imagePath = $imageData['img_url'];
+
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
+                        $deleteImageQuery = "DELETE FROM product_img WHERE img_id = :img_id";
+                        $deleteImageStmt = $pdo->prepare($deleteImageQuery);
+                        $deleteImageStmt->bindParam(':img_id', $imageId, PDO::PARAM_INT);
+                        $deleteImageStmt->execute();
+                    }
+                }
+            }
+        }
+    }
+}
+include '../include/header-ad.php'; ?>
 <title>Chi tiết sản phẩm</title>
 
 <style>
@@ -50,23 +70,22 @@ if (isset($_GET['product_id'])) {
     }
 
     .image-list img {
-        max-width: 328px;
+        max-width: 450px;
         margin: 5px;
     }
 
     .center-image {
         width: 450px;
-
     }
 </style>
 
-<div class="container mt-5 ">
+<div class="container mt-5">
     <div class="text-center">
         <img src="../asset/icon/product_detail.png" alt="Thông tin chi tiết sản phẩm" class="text-center center-image">
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <h2>Thông tin sản phẩm</h2>
             <ul class="list-group">
                 <li class="list-group-item">
@@ -78,15 +97,15 @@ if (isset($_GET['product_id'])) {
                     <?php echo !empty($product_data['product_price']) ? $product_data['product_price'] : 'Trống'; ?>
                 </li>
                 <li class="list-group-item">
-                    <strong>Scale:</strong>
+                    <strong>Tỉ lệ:</strong>
                     <?php echo !empty($detail_data['scale']) ? $detail_data['scale'] : 'Trống'; ?>
                 </li>
                 <li class="list-group-item">
-                    <strong>Detail:</strong>
+                    <strong>Chi tiết:</strong>
                     <?php echo !empty($detail_data['detail']) ? $detail_data['detail'] : 'Trống'; ?>
                 </li>
                 <li class="list-group-item">
-                    <strong>Equipment:</strong>
+                    <strong>Trang bị:</strong>
                     <?php echo !empty($detail_data['equipment']) ? $detail_data['equipment'] : 'Trống'; ?>
                 </li>
                 <li class="list-group-item">
@@ -94,12 +113,16 @@ if (isset($_GET['product_id'])) {
                     <?php echo !empty($detail_data['decal']) ? $detail_data['decal'] : 'Trống'; ?>
                 </li>
                 <li class="list-group-item">
-                    <strong>Stand:</strong>
+                    <strong>Đế dựng:</strong>
                     <?php echo !empty($detail_data['stand']) ? $detail_data['stand'] : 'Trống'; ?>
                 </li>
                 <li class="list-group-item">
-                    <strong>Origin:</strong>
+                    <strong>Xuất xứ:</strong>
                     <?php echo !empty($detail_data['origin']) ? $detail_data['origin'] : 'Trống'; ?>
+                </li>
+                <li class="list-group-item">
+                    <strong>Mô tả:</strong>
+                    <?php echo !empty($detail_data['description']) ? $detail_data['description'] : 'Trống'; ?>
                 </li>
                 <div class="my-3">
                     <a href="edit_detail.php?product_id=<?php echo $product_id; ?>" class="btn btn-primary">Chỉnh sửa
@@ -107,21 +130,61 @@ if (isset($_GET['product_id'])) {
                 </div>
             </ul>
         </div>
-
-        <div class="col-md-6">
+        <div class="col-md-7 mb-5">
             <h2>Danh sách ảnh sản phẩm</h2>
-            <div class="image-list">
-                <?php if (!empty($images)): ?>
-                    <?php foreach ($images as $image): ?>
-                        <img src="<?php echo $image['img_url']; ?>" alt="Ảnh sản phẩm" class="img-thumbnail">
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p>Không có ảnh sản phẩm nào.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
+            <form method="post">
+                <div class="image-list">
+                    <div class="d-flex">
+                        <?php if (!empty($images)): ?>
+                            <?php foreach ($images as $image): ?>
+                                <div class="mb-2 mr-2">
+                                    <label class="d-flex flex-column align-items-center">
+                                        <img src="<?php echo $image['img_url']; ?>" alt="Ảnh sản phẩm" class="img-thumbnail">
+                                        <input type="checkbox" name="selected_images[]" value="<?php echo $image['img_id']; ?>">
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>Không có ảnh sản phẩm nào.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <?php
+                    $idProduct = $_GET['product_id'] ?? null;
+                    if ($idProduct) {
+                        echo "<a href='add_image.php?product_id=$idProduct' class='btn btn-success add-image'>
+                <i class='fas fa-camera'></i>
+            </a>";
+                    } else {
+                        echo "ID not found in the URL";
+                    }
+                    ?>
+                    <button type="submit" name="delete_images" class="btn btn-danger"><i
+                            class='fas fa-trash-alt'></i></button>
+                    <button type="button" class="btn btn-primary" id="select-all">Select All</button>
+                    <button type="button" class="btn btn-primary" id="deselect-all">Deselect All</button>
+                </div>
+            </form>
 
+            <script>
+                document.getElementById("select-all").addEventListener("click", function () {
+                    let checkboxes = document.getElementsByName("selected_images[]");
+                    for (let checkbox of checkboxes) {
+                        checkbox.checked = true;
+                    }
+                });
+
+                document.getElementById("deselect-all").addEventListener("click", function () {
+                    let checkboxes = document.getElementsByName("selected_images[]");
+                    for (let checkbox of checkboxes) {
+                        checkbox.checked = false;
+                    }
+                });
+            </script>
+        </div>
+
+    </div>
 </div>
 </body>
 
