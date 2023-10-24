@@ -84,7 +84,7 @@ try {
                     <ul class="nav flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                         <li class="nav-item">
                             <a href="admin.php" class="nav-link align-middle px-0 font-black">
-                                <i class="fas fa-home"></i> Trang chủ
+                                <i class="fas fa-home"></i> Trang quản lý
                             </a>
                         </li>
                         <li>

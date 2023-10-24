@@ -180,7 +180,7 @@ if (isset($_POST['search'])) {
                                         class="fa-solid fa-magnifying-glass"></i></button>
                             </form>
                             <li class="nav-item">
-                                <a href="cart.html" class="nav-icon"><i class="fas fa-shopping-cart "></i></a>
+                                <a href="cart.php" class="nav-icon"><i class="fas fa-shopping-cart "></i></a>
                             </li>
                         </ul>
                     </div>

@@ -146,7 +146,7 @@ include '../include/header-pd.php';
                     </button>
                 </div>
                 <div class="col-md-7">
-                    <button href="#" class="btn btn-danger">THÊM VÀO GIỎ HÀNG</button>
+                    <button href="cart.php" class="btn btn-danger">THÊM VÀO GIỎ HÀNG</button>
                 </div>
             </div>
 
@@ -277,6 +277,39 @@ include '../include/header-pd.php';
     </div>
 </div>
 <?php include('../include/footer.html'); ?>
+<script>
+    $(document).ready(function () {
+        // Rating
+        $('.star').on('click', function () {
+            const rating = $(this).data('rating');
+            $('#selected-rating').text(rating);
+            $('.star').removeClass('active');
+
+            for (let i = 1; i <= rating; i++) {
+                $('.star[data-rating="' + i + '"]').addClass('active');
+            }
+        });
+
+        // Quantity + -
+        const quantityInput = $("input#quantity");
+        const decreaseButton = $("#decreaseQty");
+        const increaseButton = $("#increaseQty");
+
+        decreaseButton.click(function () {
+            let currentValue = parseInt(quantityInput.val());
+            if (!isNaN(currentValue) && currentValue > 1) {
+                quantityInput.val(currentValue - 1);
+            }
+        });
+
+        increaseButton.click(function () {
+            let currentValue = parseInt(quantityInput.val());
+            if (!isNaN(currentValue)) {
+                quantityInput.val(currentValue + 1);
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

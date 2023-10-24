@@ -24,7 +24,7 @@ include '../include/header.php';
             <div class="mb-3">
                 <label for="password" class="form-label"><i class="fa-solid fa-key"></i> Mật khẩu:</label>
                 <input type="password" class="form-control" id="password" name="password"
-                    value="<?php echo $user['password']; ?>" readonly>
+                    value="******" readonly>
             </div>
             <div class="mb-3 center-button">
                 <a href="update_account.php" class="btn btn-success">Cập nhật thông tin</a>
