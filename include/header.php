@@ -90,7 +90,7 @@ $categories = getCategories($pdo);
             </div>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="cart.html" class="nav-icon2"><i class="fas fa-shopping-cart me-5"></i></a>
+                    <a href="cart.html" class="nav-icon"><i class="fas fa-shopping-cart me-5"></i></a>
                 </li>
             </ul>
         </div>

@@ -2,14 +2,12 @@
     width: 15rem;
 }
 
-.nav-icon1,
-.nav-icon2 {
-    font-size: 28px;
+.nav-icon {
+    font-size: 30px;
     color: #000;
 }
 
-.nav-icon1:hover i,
-.nav-icon2:hover i {
+.nav-icon:hover i {
     color: rgba(1, 0, 0, 0.516);
 }
 

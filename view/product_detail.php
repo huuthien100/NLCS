@@ -36,6 +36,15 @@ if (isset($_GET['id_product'])) {
         }
 
         $categories = getCategories($pdo);
+
+        $sql = "SELECT scale, detail, equipment, decal, stand, origin, description
+                FROM product_detail
+                WHERE id_product = :id_product";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
+        $stmt->execute();
+        $productDetail = $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
         header("Location: ../view/error.php");
@@ -46,7 +55,9 @@ if (isset($_GET['id_product'])) {
 }
 include '../include/header-pd.php';
 ?>
-<title><?php echo $productInformation['name_category'] . ' - ' . $productInformation['product_name']; ?></title>
+<title>
+    <?php echo $productInformation['name_category'] . ' - ' . $productInformation['product_name']; ?>
+</title>
 <div class="container-lg mt-3">
     <!-- Main Content -->
     <div class="row">
@@ -112,11 +123,9 @@ include '../include/header-pd.php';
             <hr>
             <div class="row">
                 <div class="col-lg-12 col-md-12">
-                    <ul style="font-size: 18px; font-weight: bold;">
-                        <li>Grade: HG - High Grade</li>
-                        <li>Xuất xứ: Nhật Bản</li>
-                        <li>Chất liệu: Nhựa</li>
-                        <li>Hàng chính hãng Bandai</li>
+                    <ul style="font-size: 18px;">
+                        <li><span style="font-weight: bold;">Tỉ lệ: </span><?php echo $productDetail['scale']; ?></li>
+                        <li><span style="font-weight: bold;">Xuất xứ: </span><?php echo $productDetail['origin']; ?></li>
                     </ul>
                 </div>
             </div>
@@ -160,11 +169,8 @@ include '../include/header-pd.php';
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="description" role="tabpanel"
                     aria-labelledby="description-tab">
-                    <p>GAT-X105B/FP Build Strike Gundam Full Package ( HGBF - 1/144) là Gunpla xuất hiện trong
-                        series anime Gundam Build Fighters. <br>Mẫu Gunpla này được build bởi Sei Iori và điều khiển
-                        bởi Reiji.
+                    <?php echo $productDetail['description']; ?>
 
-                    </p>
                     <div class="image-container">
                         <?php
                         $imagePath = '../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
@@ -179,14 +185,23 @@ include '../include/header-pd.php';
 
                 <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
                     <ul>
-                        <li><strong>Cấp độ:</strong> HG với tỷ lệ 1/144</li>
-                        <li><strong>Độ chi tiết:</strong> Vừa phải, khớp chuyển động tương đối linh hoạt. Ráp theo
-                            kiểu bấm khớp, không cần dùng keo dán.</li>
-                        <li><strong>Trang bị:</strong> Beam Rifle, Beam Gun, Rifle được chỉnh sửa, khiên chắn, 2
-                            Beam Saber, 2 Cannon.</li>
-                        <li><strong>Decal:</strong> Đính kèm decal dán.</li>
-                        <li><strong>Đế dựng:</strong>Không kèm đế dựng.</li>
-                        <li><strong>Xuất xứ:</strong> Sản phẩm Gunpla chính hãng của Bandai, sản xuất tại Nhật Bản.
+                        <li><strong>Tỉ lệ:</strong>
+                            <?php echo $productDetail['scale']; ?>
+                        </li>
+                        <li><strong>Chi tiết:</strong>
+                            <?php echo $productDetail['detail']; ?>
+                        </li>
+                        <li><strong>Trang bị:</strong>
+                            <?php echo $productDetail['equipment']; ?>
+                        </li>
+                        <li><strong>Decal:</strong>
+                            <?php echo $productDetail['decal']; ?>
+                        </li>
+                        <li><strong>Đế dựng:</strong>
+                            <?php echo $productDetail['stand']; ?>
+                        </li>
+                        <li><strong>Xuất xứ:</strong>
+                            <?php echo $productDetail['origin']; ?>
                         </li>
                     </ul>
                 </div>

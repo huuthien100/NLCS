@@ -162,8 +162,8 @@ include '../include/header-ad.php'; ?>
                     ?>
                     <button type="submit" name="delete_images" class="btn btn-danger"><i
                             class='fas fa-trash-alt'></i></button>
-                    <button type="button" class="btn btn-primary" id="select-all">Select All</button>
-                    <button type="button" class="btn btn-primary" id="deselect-all">Deselect All</button>
+                    <button type="button" class="btn btn-primary" id="select-all">Chọn tất cả</button>
+                    <button type="button" class="btn btn-primary" id="deselect-all">Bỏ chọn</button>
                 </div>
             </form>
 
