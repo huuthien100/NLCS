@@ -124,8 +124,12 @@ include '../include/header-pd.php';
             <div class="row">
                 <div class="col-lg-12 col-md-12">
                     <ul style="font-size: 18px;">
-                        <li><span style="font-weight: bold;">Tỉ lệ: </span><?php echo $productDetail['scale']; ?></li>
-                        <li><span style="font-weight: bold;">Xuất xứ: </span><?php echo $productDetail['origin']; ?></li>
+                        <li><span style="font-weight: bold;">Tỉ lệ: </span>
+                            <?php echo !empty($productDetail['scale']) ? $productDetail['scale'] : 'Trống'; ?>
+                        </li>
+                        <li><span style="font-weight: bold;">Xuất xứ: </span>
+                            <?php echo !empty($productDetail['origin']) ? $productDetail['origin'] : 'Trống'; ?>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -169,8 +173,7 @@ include '../include/header-pd.php';
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="description" role="tabpanel"
                     aria-labelledby="description-tab">
-                    <?php echo $productDetail['description']; ?>
-
+                    <?php echo !empty($productDetail['description']) ? $productDetail['description'] : 'Trống'; ?>
                     <div class="image-container">
                         <?php
                         $imagePath = '../asset/product/' . strtolower($productInformation['name_category']) . '/' . strtolower($productInformation['name_category']) . '-' . strtolower($productInformation['product_name']);
@@ -186,24 +189,25 @@ include '../include/header-pd.php';
                 <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
                     <ul>
                         <li><strong>Tỉ lệ:</strong>
-                            <?php echo $productDetail['scale']; ?>
+                            <?php echo !empty($productDetail['scale']) ? $productDetail['scale'] : 'Trống'; ?>
                         </li>
                         <li><strong>Chi tiết:</strong>
-                            <?php echo $productDetail['detail']; ?>
+                            <?php echo !empty($productDetail['detail']) ? $productDetail['detail'] : 'Trống'; ?>
                         </li>
                         <li><strong>Trang bị:</strong>
-                            <?php echo $productDetail['equipment']; ?>
+                            <?php echo !empty($productDetail['equipment']) ? $productDetail['equipment'] : 'Trống'; ?>
                         </li>
                         <li><strong>Decal:</strong>
-                            <?php echo $productDetail['decal']; ?>
+                            <?php echo !empty($productDetail['decal']) ? $productDetail['decal'] : 'Trống'; ?>
                         </li>
                         <li><strong>Đế dựng:</strong>
-                            <?php echo $productDetail['stand']; ?>
+                            <?php echo !empty($productDetail['stand']) ? $productDetail['stand'] : 'Trống'; ?>
                         </li>
                         <li><strong>Xuất xứ:</strong>
-                            <?php echo $productDetail['origin']; ?>
+                            <?php echo !empty($productDetail['origin']) ? $productDetail['origin'] : 'Trống'; ?>
                         </li>
                     </ul>
+
                 </div>
 
                 <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
