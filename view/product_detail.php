@@ -2,12 +2,20 @@
 require '../include/connect.php';
 require '../include/user_session.php';
 
+function getCategories($pdo)
+{
+    $query = "SELECT * FROM category";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+$categories = getCategories($pdo);
+
 if (isset($_GET['id_product'])) {
     $id_product = $_GET['id_product'];
 
     try {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+        //Product Infomation
         $sql = "SELECT p.product_name, p.product_price, c.name_category, p.product_img
                 FROM products p
                 INNER JOIN category c ON p.id_category = c.id_category
@@ -17,26 +25,19 @@ if (isset($_GET['id_product'])) {
         $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
         $stmt->execute();
         $productInformation = $stmt->fetch(PDO::FETCH_ASSOC);
-
+        //User Infomation
         $userEmail = $_SESSION['email'];
 
-        $query = "SELECT access FROM users WHERE email = :email";
+        $query = "SELECT user_id, access FROM users WHERE email = :email";
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $access = $user['access'];
+        $user_id = $user['user_id'];
 
-        function getCategories($pdo)
-        {
-            $query = "SELECT * FROM category";
-            $stmt = $pdo->query($query);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        $categories = getCategories($pdo);
-
+        //Product Detail
         $sql = "SELECT scale, detail, equipment, decal, stand, origin, description
                 FROM product_detail
                 WHERE id_product = :id_product";
@@ -45,13 +46,16 @@ if (isset($_GET['id_product'])) {
         $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
         $stmt->execute();
         $productDetail = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (isset($_SESSION['successMessage'])) {
+            echo '<script>alert("' . $_SESSION['successMessage'] . '");</script>';
+            unset($_SESSION['successMessage']); // Remove the success message
+            echo '<script>window.location.href = "product_detail.php?id_product=' . $id_product . '";</script>';
+        }
     } catch (PDOException $e) {
         error_log("Database Error: " . $e->getMessage());
         header("Location: ../view/error.php");
         exit;
     }
-} else {
-    echo "Không có ID.";
 }
 include '../include/header-pd.php';
 ?>
@@ -76,13 +80,11 @@ include '../include/header-pd.php';
                     }
                     ?>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel"
-                    data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
                 </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel"
-                    data-bs-slide="next">
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Next</span>
                 </button>
@@ -135,44 +137,45 @@ include '../include/header-pd.php';
             </div>
             <hr>
             <div class="row add-to-cart">
-                <div class="col-md-5 product-qty">
-                    <button class="btn btn-light btn-lg" id="decreaseQty">
+                <div class="col-5 product-qty">
+                <form action="add_to_cart.php" method="post">
+                    <button class="btn btn-light btn-lg" id="decreaseQty" aria-label="Decrease Quantity">
                         <i class="fas fa-minus"></i>
                     </button>
-                    <input class="btn btn-light btn-lg" type="number" value="1" style="width: 100px;" id="quantity"
-                        readonly />
-                    <button class="btn btn-light btn-lg" id="increaseQty">
+                    
+                        <input class="btn btn-light btn-lg" type="number" name="quantity" value="1" style="width: 100px;" id="quantity" readonly placeholder="1">
+                    
+                    <button class="btn btn-light btn-lg" id="increaseQty" aria-label="Increase Quantity">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
-                <div class="col-md-7">
-                    <button href="cart.php" class="btn btn-danger">THÊM VÀO GIỎ HÀNG</button>
+                <div class="col-7">
+                        <input type="hidden" name="id_product" value="<?php echo $id_product; ?>">
+                        <button type="submit" class="btn btn-danger p-2" name="add_to_cart">THÊM VÀO GIỎ HÀNG</button>
+                    </form>
                 </div>
             </div>
+
 
             <hr style="color: white;">
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" id="myTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link active" id="description-tab" data-bs-toggle="tab" href="#description" role="tab"
-                        aria-controls="description" aria-selected="true">Mô tả</a>
+                    <a class="nav-link active" id="description-tab" data-bs-toggle="tab" href="#description" role="tab" aria-controls="description" aria-selected="true">Mô tả</a>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" id="features-tab" data-bs-toggle="tab" href="#features" role="tab"
-                        aria-controls="features" aria-selected="false">Đặc điểm</a>
+                    <a class="nav-link" id="features-tab" data-bs-toggle="tab" href="#features" role="tab" aria-controls="features" aria-selected="false">Đặc điểm</a>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab"
-                        aria-controls="reviews" aria-selected="false">Đánh giá</a>
+                    <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Đánh giá</a>
                 </li>
             </ul>
             <!-- End Nav tabs -->
 
             <!-- Tab panes -->
             <div class="tab-content">
-                <div class="tab-pane fade show active" id="description" role="tabpanel"
-                    aria-labelledby="description-tab">
+                <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
                     <?php echo !empty($productDetail['description']) ? $productDetail['description'] : 'Trống'; ?>
                     <div class="image-container">
                         <?php
@@ -218,8 +221,7 @@ include '../include/header-pd.php';
                         </div>
                         <div class="review-content">
                             <div class="review-header">
-                                <a href="https://maniruzzaman-akash.blogspot.com/p/contact.html"
-                                    class="review-author">Person 1</a>
+                                <a href="https://maniruzzaman-akash.blogspot.com/p/contact.html" class="review-author">Person 1</a>
                                 <div class="review-rating">
                                     <i class="fas fa-star text-warning"></i>
                                     <i class="fas fa-star text-warning"></i>
@@ -247,8 +249,7 @@ include '../include/header-pd.php';
                         </div>
                         <div class="review-content">
                             <div class="review-header">
-                                <a href="https://maniruzzaman-akash.blogspot.com/p/contact.html"
-                                    class="review-author">Person 2</a>
+                                <a href="https://maniruzzaman-akash.blogspot.com/p/contact.html" class="review-author">Person 2</a>
                                 <div class="review-rating">
                                     <i class="fas fa-star text-warning"></i>
                                     <i class="fas fa-star text-warning"></i>
@@ -278,9 +279,9 @@ include '../include/header-pd.php';
 </div>
 <?php include('../include/footer.html'); ?>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         // Rating
-        $('.star').on('click', function () {
+        $('.star').on('click', function() {
             const rating = $(this).data('rating');
             $('#selected-rating').text(rating);
             $('.star').removeClass('active');
@@ -295,14 +296,16 @@ include '../include/header-pd.php';
         const decreaseButton = $("#decreaseQty");
         const increaseButton = $("#increaseQty");
 
-        decreaseButton.click(function () {
+        decreaseButton.click(function(event) {
+            event.preventDefault();
             let currentValue = parseInt(quantityInput.val());
             if (!isNaN(currentValue) && currentValue > 1) {
                 quantityInput.val(currentValue - 1);
             }
         });
 
-        increaseButton.click(function () {
+        increaseButton.click(function(event) {
+            event.preventDefault();
             let currentValue = parseInt(quantityInput.val());
             if (!isNaN(currentValue)) {
                 quantityInput.val(currentValue + 1);

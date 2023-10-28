@@ -2,7 +2,45 @@
 require '../include/connect.php';
 require '../include/user_session.php';
 include('../include/header.php');
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    require '../include/connect.php';
+    $itemId = $_POST['itemId'];
+    $quantity = $_POST['quantity'];
+
+    $query = "UPDATE cart SET quantity = :quantity WHERE id = :itemId";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+    $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        updateTotalPrice($itemId, $quantity);
+        echo "Cập nhật giỏ hàng thành công.";
+    } else {
+        echo "Cập nhật giỏ hàng thất bại.";
+    }
+}
+
+function updateTotalPrice($itemId, $quantity)
+{
+    global $pdo;
+    $query = "SELECT product_price FROM products WHERE id_product IN (SELECT id_product FROM cart WHERE id = :itemId)";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+    $stmt->execute();
+    $productPrice = $stmt->fetchColumn();
+
+    $totalPrice = $productPrice * $quantity;
+
+    $updateQuery = "UPDATE cart SET total_price = :totalPrice WHERE id = :itemId";
+    $updateStmt = $pdo->prepare($updateQuery);
+    $updateStmt->bindParam(':totalPrice', $totalPrice, PDO::PARAM_INT);
+    $updateStmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+    if ($updateStmt->execute()) {
+    }
+}
 ?>
+
 <title>Cart</title>
 
 <div class="container">
@@ -21,70 +59,47 @@ include('../include/header.php');
             </tr>
         </thead>
         <tbody>
-            <!-- Sample product 1 -->
-            <tr>
-                <td style="text-align: center;" class="align-middle">
-                    <input type="checkbox" class="product-checkbox" data-id="1">
-                </td>
-                <td class="align-middle">
-                    <div class="d-flex align-items-center">
-                        <img src="../asset/product/hg/hg-aerial gundam/aerial gundam-1.jpg" alt="Product Image" width="100" height="100">
-                        <span class="ms-2">Sản phẩm mẫu 1</span>
-                    </div>
-                </td>
-                <td id="price_1" class="align-middle"> 100,000 VNĐ</td>
-                <td class="align-middle">
-                    <button class="btn btn-light btn-lg decrease-qty" data-id="1">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <input class="btn btn-light btn-lg quantity-input" type="number" value="1" style="width: 100px;" id="quantity-1" readonly />
-                    <button class="btn btn-light btn-lg increase-qty" data-id="1">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </td>
-                <td id="subtotal_1" class="align-middle">100,000 VNĐ</td>
-                <td class="align-middle">
-                    <button class="btn btn-danger remove-product" data-id="1">
-                        <i class="fas fa-trash-alt"></i> <!-- Delete icon -->
-                    </button>
-                </td>
-            </tr>
-            <!-- End of sample product 1 -->
+            <?php
+            $user_id = $_SESSION['user_id'];
 
-            <!-- Sample product 2 -->
-            <tr>
-                <td style="text-align: center;" class="align-middle">
-                    <input type="checkbox" class="product-checkbox" data-id="2">
-                </td>
-                <td class="align-middle">
-                    <div class="d-flex align-items-center">
-                        <img src="product_image_url_2.jpg" alt="Product Image 2" width="100" height="100">
-                        <span class="ms-2">Sản phẩm mẫu 2</span>
-                    </div>
-                </td>
-                <td id="price_2" class="align-middle">120,000 VNĐ</td>
-                <td class="align-middle">
-                    <button class="btn btn-light btn-lg decrease-qty" data-id="2">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <input class="btn btn-light btn-lg quantity-input" type="number" value="1" style="width: 100px;" id="quantity-2" readonly />
-                    <button class="btn btn-light btn-lg increase-qty" data-id="2">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </td>
-                <td id="subtotal_2" class="align-middle">120,000 VNĐ</td>
-                <td class="align-middle">
-                    <button class="btn btn-danger remove-product" data-id="2">
-                        <i class="fas fa-trash-alt"></i> <!-- Delete icon -->
-                    </button>
-                </td>
-            </tr>
-            <!-- End of sample product 2 -->
+            $query = "SELECT c.id, c.id_product,c.total_price, p.product_name, p.product_price, c.quantity, p.product_img
+                      FROM cart c
+                      INNER JOIN products p ON c.id_product = p.id_product
+                      WHERE c.user_id = :user_id";
 
-            <!-- Calculate and display the total -->
+            $stmt = $pdo->prepare($query);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($cartItems as $item) {
+                echo '<tr>';
+                echo '<td style="text-align: center;" class="align-middle">';
+                echo '<input type="checkbox" class="product-checkbox" data-id="' . $item['id'] . '">';
+                echo '</td>';
+                echo '<td class="align-middle">';
+                echo '<div class="d-flex align-items-center">';
+                echo '<img src="' . $item['product_img'] . '" alt="Product Image" width="100" height="100">';
+                echo '<span class="ms-2">' . $item['product_name'] . '</span>';
+                echo '</div>';
+                echo '</td>';
+                echo '<td class="align-middle">' . number_format($item['product_price']) . ' VNĐ</td>';
+                echo '<td class="align-middle">';
+                echo '<button class="btn btn-light btn-lg decrease-qty" id="decreaseQty" data-id="' . $item['id'] . '"><i class="fas fa-minus"></i></button>';
+                echo '<input class="btn btn-light btn-lg quantity-input m-1" type="number" value="' . $item['quantity'] . '" style="width: 100px;" id="quantity-' . $item['id'] . '" readonly />';
+                echo '<button class="btn btn-light btn-lg increase-qty" id="increaseQty" data-id="' . $item['id'] . '"><i class="fas fa-plus"></i></button>';
+                echo '</td>';
+                echo '<td class="align-middle total-amount">' . number_format($item['total_price']) . ' VNĐ</td>';
+                echo '<td class="align-middle">';
+                echo '<button class="btn btn-danger remove-product" data-id="' . $item['id'] . '"><i class="fas fa-trash-alt"></i></button>';
+                echo '</td>';
+                echo '</tr>';
+            }
+            ?>
             <tr>
                 <td colspan="4" class="align-middle">Tổng tiền:</td>
                 <td id="total" class="align-middle">0 VNĐ</td>
+                <input type="hidden" id="total-value" name="total-value" value="0">
                 <td class="align-middle">
                     <button class="btn btn-success checkout">Thanh toán</button>
                 </td>
@@ -93,94 +108,85 @@ include('../include/header.php');
     </table>
 </div>
 <?php include('../include/footer.html') ?>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        const selectAllCheckbox = $('#select-all');
-        const productCheckboxes = $('.product-checkbox');
-        const quantityInputs = $('.quantity-input');
-        const decreaseButtons = $('.decrease-qty');
-        const increaseButtons = $('.increase-qty');
-        const removeButtons = $('.remove-product');
-
-        selectAllCheckbox.change(function () {
-            productCheckboxes.prop('checked', selectAllCheckbox.prop('checked'));
-            calculateTotal();
+    $(document).ready(function() {
+        $('.increase-qty').click(function() {
+            const quantityInput = $(this).closest('tr').find('.quantity-input');
+            let quantity = parseInt(quantityInput.val());
+            quantity += 1;
+            quantityInput.val(quantity);
+            const itemId = $(this).data('id');
+            updateQuantityInDatabase(itemId, quantity);
         });
 
-        productCheckboxes.change(function () {
-            calculateTotal();
-        });
-
-        quantityInputs.keydown(function (event) {
-            if (event.key === 'Enter') {
-                updateQuantity($(this));
+        $('.decrease-qty').click(function() {
+            const quantityInput = $(this).closest('tr').find('.quantity-input');
+            let quantity = parseInt(quantityInput.val());
+            if (quantity > 1) {
+                quantity -= 1;
+                quantityInput.val(quantity);
+                const itemId = $(this).data('id');
+                updateQuantityInDatabase(itemId, quantity);
             }
         });
 
-        decreaseButtons.click(function () {
-            const productId = $(this).data('id');
-            const input = $(`#quantity-${productId}`);
-            updateQuantityInput(input, -1);
+        function updateQuantityInDatabase(itemId, quantity) {
+            $.ajax({
+                type: 'POST',
+                url: 'cart.php',
+                data: {
+                    itemId: itemId,
+                    quantity: quantity
+                },
+                success: function(data) {
+                    location.reload();
+                },
+
+                error: function() {}
+            });
+        }
+        $('#select-all').change(function() {
+            var isChecked = $(this).is(':checked');
+            $('.product-checkbox').prop('checked', isChecked);
         });
 
-        increaseButtons.click(function () {
-            const productId = $(this).data('id');
-            const input = $(`#quantity-${productId}`);
-            updateQuantityInput(input, 1);
-        });
-
-        removeButtons.click(function () {
-            removeProduct($(this).data('id'));
-        });
-
-        function updateQuantityInput(input, change) {
-            const productId = input.attr('id').split('-')[1];
-            const subtotalElement = $(`#subtotal_${productId}`);
-            const priceElement = $(`#price_${productId}`);
-
-            const quantity = parseInt(input.val());
-            if (quantity + change >= 1) {
-                input.val(quantity + change);
-
-                const price = parseInt(priceElement.text().replace(/[^0-9]/g, ''));
-                const subtotal = price * (quantity + change);
-                subtotalElement.text(subtotal.toLocaleString('vi-VN') + ' VNĐ');
-            }
-
-            calculateTotal();
+        if (<?php echo count($cartItems); ?> === 1) {
+            $('.product-checkbox').change(function() {
+                var isChecked = $(this).is(':checked');
+                $('#select-all').prop('checked', isChecked);
+            });
         }
 
-        function removeProduct(productId) {
-            const productRow = $(`tr[data-id="${productId}"]`);
-            productRow.remove();
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            let total = 0;
-            productCheckboxes.each(function () {
-                if ($(this).prop('checked')) {
-                    const productId = $(this).data('id');
-                    const input = $(`#quantity-${productId}`);
-                    const subtotalElement = $(`#subtotal_${productId}`);
-                    const priceElement = $(`#price_${productId}`);
-
-                    const quantity = parseInt(input.val());
-                    const price = parseInt(priceElement.text().replace(/[^0-9]/g, ''));
-                    const subtotal = price * quantity;
-                    subtotalElement.text(subtotal.toLocaleString('vi-VN') + ' VNĐ');
-                    total += subtotal;
-                }
+        function calculateTotalPrice() {
+            var total = 0;
+            $('.product-checkbox:checked').each(function() {
+                var itemId = $(this).data('id');
+                var total_price_str = $(this).closest('tr').find('.total-amount').text().replace(' VNĐ', '').replace(/,/g, ''); // Remove existing commas
+                var total_price = parseFloat(total_price_str);
+                total += total_price;
             });
 
+            // Update the hidden input with the total value
+            $('#total-value').val(total);
             $('#total').text(total.toLocaleString('vi-VN') + ' VNĐ');
         }
-    });
+        // Bắt sự kiện khi checkbox thay đổi trạng thái
+        $('.product-checkbox, #select-all').change(function() {
+            calculateTotalPrice();
+        });
 
-    $('.checkout').click(function () {
-        alert('Redirect to payment page or perform checkout here.');
+        // Bắt sự kiện khi nút "Thay đổi số lượng" được nhấn
+        $('.increase-qty, .decrease-qty').click(function() {
+            calculateTotalPrice();
+        });
+
+        // Hàm định dạng số tiền với dấu phẩy ngăn cách hàng nghìn
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
     });
 </script>
+
 </body>
+
 </html>
