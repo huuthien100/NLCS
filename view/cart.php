@@ -22,9 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['checkout'])) {
-        $selectedItems = $_POST['selectedItems'];
+        $selectedItems = isset($_POST['selectedItems']) ? $_POST['selectedItems'] : '';
         if (!empty($selectedItems)) {
-            foreach ($selectedItems as $selectedItemId) {
+            // Chuyển dãy số thành mảng
+            $selectedItemsArray = explode(',', $selectedItems);
+            
+            foreach ($selectedItemsArray as $selectedItemId) {
                 $query = "DELETE FROM cart WHERE id = :itemId";
                 $stmt = $pdo->prepare($query);
                 $stmt->bindParam(':itemId', $selectedItemId, PDO::PARAM_INT);
@@ -59,60 +62,60 @@ function updateTotalPrice($itemId, $quantity)
 
 <div class="container">
     <h1>Giỏ hàng</h1>
-    <table class="table table-striped">
-        <thead>
+    <form method="POST" action="checkout.php">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col" style="text-align: center;">
+                        <input type="checkbox" id="select-all">
+                    </th>
+                    <th scope="col" class="align-middle">Sản phẩm</th>
+                    <th scope="col" class="align-middle">Giá</th>
+                    <th scope="col" class="align-middle">Số lượng</th>
+                    <th scope="col" class="align-middle">Thành tiền</th>
+                    <th scope="col" class="align-middle">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $user_id = $_SESSION['user_id'];
+
+                $query = "SELECT c.id, c.id_product, c.total_price, p.product_name, p.product_price, c.quantity, p.product_img
+                                  FROM cart c
+                                  INNER JOIN products p ON c.id_product = p.id_product
+                                  WHERE c.user_id = :user_id";
+
+                $stmt = $pdo->prepare($query);
+                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($cartItems as $item) {
+                    echo '<tr>';
+                    echo '<td style="text-align: center;" class="align-middle">';
+                    echo '<input type="checkbox" class="product-checkbox" data-id="' . $item['id'] . '">';
+                    echo '</td>';
+                    echo '<td class="align-middle">';
+                    echo '<div class="d-flex align-items-center">';
+                    echo '<img src="' . $item['product_img'] . '" alt="Product Image" width="100" height="100">';
+                    echo '<span class="ms-2">' . $item['product_name'] . '</span>';
+                    echo '</div>';
+                    echo '</td>';
+                    echo '<td class="align-middle">' . number_format($item['product_price']) . ' VNĐ</td>';
+                    echo '<td class="align-middle">';
+                    echo '<button class="btn btn-light btn-lg decrease-qty" id="decreaseQty" data-id="' . $item['id'] . '"><i class="fas fa-minus"></i></button>';
+                    echo '<input class="btn btn-light btn-lg quantity-input m-1" type="number" value="' . $item['quantity'] . '" style="width: 100px;" id="quantity-' . $item['id'] . '" readonly />';
+                    echo '<button class="btn btn-light btn-lg increase-qty" id="increaseQty" data-id="' . $item['id'] . '"><i class="fas fa-plus"></i></button>';
+                    echo '</td>';
+                    echo '<td class="align-middle total-amount">' . number_format($item['total_price']) . ' VNĐ</td>';
+                    echo '<td class="align-middle">';
+                    echo '<button class="btn btn-danger remove-product" data-id="' . $item['id'] . '"><i class="fas fa-trash-alt"></i></button>';
+                    echo '</td>';
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
             <tr>
-                <th scope="col" style="text-align: center;">
-                    <input type="checkbox" id="select-all">
-                </th>
-                <th scope="col" class="align-middle">Sản phẩm</th>
-                <th scope="col" class="align-middle">Giá</th>
-                <th scope="col" class="align-middle">Số lượng</th>
-                <th scope="col" class="align-middle">Thành tiền</th>
-                <th scope="col" class="align-middle">Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $user_id = $_SESSION['user_id'];
-
-            $query = "SELECT c.id, c.id_product,c.total_price, p.product_name, p.product_price, c.quantity, p.product_img
-                              FROM cart c
-                              INNER JOIN products p ON c.id_product = p.id_product
-                              WHERE c.user_id = :user_id";
-
-            $stmt = $pdo->prepare($query);
-            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-            $stmt->execute();
-            $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($cartItems as $item) {
-                echo '<tr>';
-                echo '<td style="text-align: center;" class="align-middle">';
-                echo '<input type="checkbox" class="product-checkbox" data-id="' . $item['id'] . '">';
-                echo '</td>';
-                echo '<td class="align-middle">';
-                echo '<div class="d-flex align-items-center">';
-                echo '<img src="' . $item['product_img'] . '" alt="Product Image" width="100" height="100">';
-                echo '<span class="ms-2">' . $item['product_name'] . '</span>';
-                echo '</div>';
-                echo '</td>';
-                echo '<td class="align-middle">' . number_format($item['product_price']) . ' VNĐ</td>';
-                echo '<td class="align-middle">';
-                echo '<button class="btn btn-light btn-lg decrease-qty" id="decreaseQty" data-id="' . $item['id'] . '"><i class="fas fa-minus"></i></button>';
-                echo '<input class="btn btn-light btn-lg quantity-input m-1" type="number" value="' . $item['quantity'] . '" style="width: 100px;" id="quantity-' . $item['id'] . '" readonly />';
-                echo '<button class="btn btn-light btn-lg increase-qty" id="increaseQty" data-id="' . $item['id'] . '"><i class="fas fa-plus"></i></button>';
-                echo '</td>';
-                echo '<td class="align-middle total-amount">' . number_format($item['total_price']) . ' VNĐ</td>';
-                echo '<td class="align-middle">';
-                echo '<button class="btn btn-danger remove-product" data-id="' . $item['id'] . '"><i class="fas fa-trash-alt"></i></button>';
-                echo '</td>';
-                echo '</tr>';
-            }
-            ?>
-        </tbody>
-        <tr>
-            <form method="POST" action="checkout.php" class="">
                 <td colspan="2">
                     <div class="row">
                         <div class="col-md-4">
@@ -132,13 +135,13 @@ function updateTotalPrice($itemId, $quantity)
                     0 VNĐ
                 </td>
                 <input type="hidden" id="total-value" name="total-value" value="0">
+                <input type="hidden" id="selectedItems" name="selectedItems" value=""> <!-- Trường ẩn để lưu danh sách các mục đã chọn -->
                 <td class="align-middle">
                     <button type="submit" name="checkout" class="btn btn-success checkout" id="checkout-button">Xác nhận thanh toán</button>
                 </td>
-            </form>
-        </tr>
-
-    </table>
+            </tr>
+        </table>
+    </form>
 </div>
 
 <?php include('../include/footer.html') ?>
@@ -194,6 +197,13 @@ function updateTotalPrice($itemId, $quantity)
             } else {
                 $('#select-all').prop('checked', false);
             }
+
+            // Cập nhật danh sách mục đã chọn
+            var selectedItems = [];
+            $('.product-checkbox:checked').each(function() {
+                selectedItems.push($(this).data('id'));
+            });
+            $('#selectedItems').val(selectedItems.join(','));
         });
 
         function calculateTotalPrice() {
@@ -226,7 +236,5 @@ function updateTotalPrice($itemId, $quantity)
         });
     });
 </script>
-
 </body>
-
 </html>

@@ -17,29 +17,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['checkout'])) {
     $orderStmt->bindParam(':shipping_address', $shipping_address);
     $orderStmt->bindParam(':total_price', $total_price, PDO::PARAM_INT);
     $orderStmt->bindParam(':status', $status);
-    
+
     if ($orderStmt->execute()) {
         $orderId = $pdo->lastInsertId();
 
-        $query = "SELECT id_product, quantity FROM cart WHERE user_id = :user_id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (isset($_POST['selectedItems'])) {
+            $selectedItems = explode(',', $_POST['selectedItems']);
 
-        foreach ($cartItems as $item) {
-            $insertOrderItemQuery = "INSERT INTO order_detail (order_id, id_product, quantity) VALUES (:order_id, :id_product, :quantity)";
-            $orderItemStmt = $pdo->prepare($insertOrderItemQuery);
-            $orderItemStmt->bindParam(':order_id', $orderId, PDO::PARAM_INT);
-            $orderItemStmt->bindParam(':id_product', $item['id_product'], PDO::PARAM_INT);
-            $orderItemStmt->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
-            $orderItemStmt->execute();
+            foreach ($selectedItems as $itemId) {
+                $query = "SELECT id_product, quantity FROM cart WHERE id = :itemId AND user_id = :user_id";
+                $stmt = $pdo->prepare($query);
+                $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $insertOrderItemQuery = "INSERT INTO order_detail (order_id, id_product, quantity) VALUES (:order_id, :id_product, :quantity)";
+                $orderItemStmt = $pdo->prepare($insertOrderItemQuery);
+                $orderItemStmt->bindParam(':order_id', $orderId, PDO::PARAM_INT);
+                $orderItemStmt->bindParam(':id_product', $item['id_product'], PDO::PARAM_INT);
+                $orderItemStmt->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
+                $orderItemStmt->execute();
+
+                $deleteCartItemQuery = "DELETE FROM cart WHERE id = :itemId AND user_id = :user_id";
+                $deleteCartItemStmt = $pdo->prepare($deleteCartItemQuery);
+                $deleteCartItemStmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+                $deleteCartItemStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $deleteCartItemStmt->execute();
+            }
         }
-
-        $clearCartQuery = "DELETE FROM cart WHERE user_id = :user_id";
-        $clearCartStmt = $pdo->prepare($clearCartQuery);
-        $clearCartStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        $clearCartStmt->execute();
     } else {
         echo "Có lỗi xảy ra khi đặt hàng.";
     }
@@ -63,4 +69,3 @@ require '../include/header-ad.php';
 <?php
 require '../include/footer.html';
 ?>
-
