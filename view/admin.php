@@ -14,7 +14,7 @@ try {
     $stmtProducts->execute();
     $totalProducts = $stmtProducts->fetchColumn();
 
-    $sqlComments = "SELECT COUNT(*) FROM comments";
+    $sqlComments = "SELECT COUNT(*) FROM orders";
     $stmtComments = $pdo->prepare($sqlComments);
     $stmtComments->execute();
     $totalComments = $stmtComments->fetchColumn();
@@ -53,15 +53,13 @@ try {
                 <img id="logo" src="../asset/icon/icon.png" alt="Logo" class="ms-5">
             </a>
             <div class="dropdown pt-3">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle me-4"
-                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle me-4" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                     <?php
                     if (isset($_SESSION['username'])) {
                         echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
                     }
                     ?>
-                    <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35"
-                        class="rounded-circle">
+                    <img src="../asset/icon/profile-user.png" alt="user.png" width="35" height="35" class="rounded-circle">
                 </a>
                 <ul class="dropdown-menu bg-body-tertiary dropdown-menu-lg-end" style="z-index: 10000;">
                     <li><a class="dropdown-item" href="../index.php">Trang chủ</a></li>
@@ -104,8 +102,8 @@ try {
                             </a>
                         </li>
                         <li>
-                            <a href="comment_manage.php" class="nav-link px-0 align-middle font-black">
-                                <i class="fas fa-comments"></i> Quản lý bình luận
+                            <a href="orders_manage.php" class="nav-link px-0 align-middle font-black">
+                                <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                             </a>
                         </li>
                     </ul>
@@ -156,8 +154,7 @@ try {
                         <div class="card mb-3" style="max-width: 540px;">
                             <div class="row g-0">
                                 <div class="col-md-4 p-2 bg-info">
-                                    <img src="../asset/icon/shopping_cart.png" class="img-fluid rounded-start"
-                                        alt="Sản phẩm">
+                                    <img src="../asset/icon/shopping_cart.png" class="img-fluid rounded-start" alt="Sản phẩm">
                                 </div>
                                 <div class="col-md-8">
                                     <div class="card-body">
@@ -170,7 +167,7 @@ try {
                             </div>
                         </div>
                     </div>
-                    <!-- Card bình luận -->
+                    <!-- Card đơn hàng -->
                     <div class="col-md-6">
                         <div class="card mb-3" style="max-width: 540px;">
                             <div class="row g-0">
@@ -179,9 +176,39 @@ try {
                                 </div>
                                 <div class="col-md-8">
                                     <div class="card-body">
-                                        <h5 class="card-title">Bình luận</h5>
-                                        <p class="card-text">Số bình luận:
+                                        <h5 class="card-title">Đơn hàng</h5>
+                                        <p class="card-text">Số đơn hàng:
                                             <?php echo $totalComments; ?>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card doanh thu -->
+                    <div class="col-md-6">
+                        <div class="card mb-3" style="max-width: 540px;">
+                            <div class="row g-0">
+                                <div class="col-md-4 p-2 bg-danger">
+                                    <img src="../asset/icon/money.png" class="img-fluid rounded-start" alt="Doanh thu">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Doanh thu</h5>
+                                        <p class="card-text">Tổng doanh thu:
+                                            <?php
+                                            $totalRevenue = 0;
+                                            try {
+                                                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                                $sqlRevenue = "SELECT SUM(total_price) FROM orders";
+                                                $stmtRevenue = $pdo->prepare($sqlRevenue);
+                                                $stmtRevenue->execute();
+                                                $totalRevenue = $stmtRevenue->fetchColumn();
+                                            } catch (PDOException $e) {
+                                                echo "Lỗi kết nối đến cơ sở dữ liệu: " . $e->getMessage();
+                                            }
+                                            echo number_format($totalRevenue) . ' VNĐ';
+                                            ?>
                                         </p>
                                     </div>
                                 </div>

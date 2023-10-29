@@ -10,7 +10,6 @@ if (isset($_POST['delete_user'])) {
         $deleteStmt = $pdo->prepare($deleteSql);
         $deleteStmt->bindParam(':username', $username, PDO::PARAM_STR);
         $deleteStmt->execute();
-
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
@@ -41,7 +40,7 @@ try {
                 <ul class="nav flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                     <li class="nav-item">
                         <a href="admin.php" class="nav-link align-middle px-0 font-black">
-                            <i class="fas fa-home"></i> Trang chủ
+                            <i class="fas fa-home"></i> Trang quản lý
                         </a>
                     </li>
                     <li>
@@ -49,6 +48,7 @@ try {
                             <i class="fas fa-users"></i> Quản lý thành viên
                         </a>
                     </li>
+
                     <li>
                         <a href="category_manage.php" class="nav-link px-0 align-middle font-black">
                             <i class="fas fa-list"></i> Quản lý danh mục
@@ -60,8 +60,8 @@ try {
                         </a>
                     </li>
                     <li>
-                        <a href="comment_manage.php" class="nav-link px-0 align-middle font-black">
-                            <i class="fas fa-comments"></i> Quản lý bình luận
+                        <a href="orders_manage.php" class="nav-link px-0 align-middle font-black">
+                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                         </a>
                     </li>
                 </ul>
@@ -108,14 +108,12 @@ try {
     </div>
 </div>
 
-<div class="modal fade" id="confirmDeleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelUser"
-    aria-hidden="true">
+<div class="modal fade" id="confirmDeleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelUser" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabelUser">Xác nhận xóa người dùng</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                    style="border: none; box-shadow: none; background: none; font-size:25px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="border: none; box-shadow: none; background: none; font-size:25px">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -130,8 +128,8 @@ try {
     </div>
 </div>
 <script>
-    $(document).ready(function () {
-        $(".delete-user").on("click", function () {
+    $(document).ready(function() {
+        $(".delete-user").on("click", function() {
             var username = $(this).data("username");
 
             $("#confirmDeleteUserButton").data("username", username);
@@ -139,23 +137,23 @@ try {
             $("#confirmDeleteUserModal").modal("show");
         });
 
-        $(document).on("keypress", function (e) {
+        $(document).on("keypress", function(e) {
             if (e.key === "Enter") {
                 $("#confirmDeleteUserButton").click();
             }
         });
 
-        $("#confirmDeleteUserButton").on("click", function () {
+        $("#confirmDeleteUserButton").on("click", function() {
             var username = $(this).data("username");
             $(".delete-user-form[data-username='" + username + "']").submit();
             $("#confirmDeleteUserModal").modal("hide");
         });
 
-        $("#confirmDeleteUserModal .btn-secondary").on("click", function () {
+        $("#confirmDeleteUserModal .btn-secondary").on("click", function() {
             $("#confirmDeleteUserModal").modal("hide");
         });
 
-        $("#confirmDeleteUserModal .close").on("click", function () {
+        $("#confirmDeleteUserModal .close").on("click", function() {
             $("#confirmDeleteUserModal").modal("hide");
         });
     });

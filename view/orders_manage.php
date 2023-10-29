@@ -2,35 +2,25 @@
 require '../include/connect.php';
 require '../include/user_session.php';
 
-if (isset($_POST['delete_category'])) {
-    try {
-        $category_id = $_POST['delete_category'];
-
-        $deleteSql = "DELETE FROM category WHERE id_category = :category_id";
-        $deleteStmt = $pdo->prepare($deleteSql);
-        $deleteStmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
-        $deleteStmt->execute();
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
-}
-
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $sql = "SELECT id_category, name_category FROM category";
+    $sql = "SELECT o.order_id, u.username as user_id, o.order_date, o.shipping_address, o.total_price, o.status 
+            FROM orders o
+            INNER JOIN users u ON o.user_id = u.user_id";
 
     $stmt = $pdo->prepare($sql);
 
     $stmt->execute();
 
-    $categoryInformation = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $orderInformation = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    echo "Lỗi: " . $e->getMessage();
 }
 ?>
 <?php include '../include/header-ad.php'; ?>
-<title>Quản lý danh mục</title>
+<title>Quản lý đơn hàng</title>
+
 <div class="container-fluid">
     <div class="row flex-nowrap">
         <!-- Sidebar -->
@@ -47,7 +37,6 @@ try {
                             <i class="fas fa-users"></i> Quản lý thành viên
                         </a>
                     </li>
-
                     <li>
                         <a href="category_manage.php" class="nav-link px-0 align-middle font-black">
                             <i class="fas fa-list"></i> Quản lý danh mục
@@ -67,33 +56,37 @@ try {
             </div>
         </div>
         <!-- End Sidebar -->
-        <!-- Category Table -->
         <div class="col py-3">
             <div class="d-flex justify-content-between">
-                <h1>Quản lý danh mục</h1>
-                <a href="add_category.php" class="btn btn-success pt-3">
-                    Thêm danh mục <i class="fa-solid fa-plus" style="color: #ffffff;"></i>
-                </a>
+                <h1>Quản lý đơn hàng</h1>
             </div>
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Tên danh mục</th>
+                        <th>Người đặt hàng</th>
+                        <th>Ngày đặt hàng</th>
+                        <th>Địa chỉ giao hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    if (isset($categoryInformation) && is_array($categoryInformation)) {
-                        foreach ($categoryInformation as $category) {
+                    if (isset($orderInformation) && is_array($orderInformation)) {
+                        foreach ($orderInformation as $order) {
                             echo "<tr>";
-                            echo "<td>" . $category['name_category'] . "</td>";
+                            echo "<td>" . $order['user_id'] . "</td>";
+                            echo "<td>" . $order['order_date'] . "</td>";
+                            echo "<td>" . $order['shipping_address'] . "</td>";
+                            echo "<td>" . number_format($order['total_price']) . ' VNĐ' . "</td>";
+                            echo "<td>" . $order['status'] . "</td>";
                             echo "<td>
-                                <a href='edit_category.php?category_id=" . $category['id_category'] . "' class='btn btn-primary'><i class='fa-solid fa-pencil' style='color: #ffffff;'></i></a>
-                                <button type='button' class='btn btn-danger delete-category' data-category-id='" . $category['id_category'] . "'><i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
-                                
-                                <form method='post' class='delete-category-form' data-category-id='" . $category['id_category'] . "'>
-                                    <input type='hidden' name='delete_category' value='" . $category['id_category'] . "'>
+                                <button type='button' class='btn btn-success confirm-order' data-order_id='" . $order['order_id'] . "'><i class='fa-solid fa-check' style='color: #ffffff;'></i></button>
+                                <a href='order_detail.php?order_id=" . $order['order_id'] . "' class='btn btn-info'><i class='fas fa-eye' style='color: #ffffff;'></i></a>
+                                <button type='button' class='btn btn-danger delete-order' data-order_id='" . $order['order_id'] . "'><i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
+                                <form method='post' class='delete-order-form' data-order_id='" . $order['order_id'] . "'>
+                                    <input type='hidden' name='delete_order' value='" . $order['order_id'] . "'>
                                 </form>
                             </td>";
                             echo "</tr>";
@@ -103,61 +96,63 @@ try {
                 </tbody>
             </table>
         </div>
-        <!-- End Category Table -->
     </div>
 </div>
-<!-- Delete Modal -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="confirmDeleteOrderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelOrder" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa danh mục</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="border: none; box-shadow: none; background: none; font-size:25px">
+                <h5 class="modal-title" id="exampleModalLabelOrder">Xác nhận xóa đơn hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="border: none; box-shadow: none; background: none; font-size: 25px">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                Bạn có chắc chắn muốn xóa danh mục này?
+                Bạn có chắc chắn muốn xóa đơn hàng này?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Xóa</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteOrderButton">Xóa</button>
             </div>
         </div>
     </div>
 </div>
-<!-- End Delete Modal -->
+
 <script>
     $(document).ready(function() {
-        $(".delete-category").on("click", function() {
-            var categoryId = $(this).data("category-id");
+        $(".delete-order").on("click", function() {
+            var order_id = $(this).data("order_id");
+            $("#confirmDeleteOrderButton").data("order_id", order_id);
+            $("#confirmDeleteOrderModal").modal("show");
+        });
 
-            $("#confirmDeleteButton").data("category-id", categoryId);
-
-            $("#confirmDeleteModal").modal("show");
+        $(".confirm-order").on("click", function() {
+            var order_id = $(this).data("order_id");
+            $("form[data-order_id='" + order_id + "']").submit();
         });
 
         $(document).on("keypress", function(e) {
             if (e.key === "Enter") {
-                $("#confirmDeleteButton").click();
+                $("#confirmDeleteOrderButton").click();
             }
         });
 
-        $("#confirmDeleteButton").on("click", function() {
-            var categoryId = $(this).data("category-id");
-            $(".delete-category-form[data-category-id='" + categoryId + "']").submit();
-            $("#confirmDeleteModal").modal("hide");
+        $("#confirmDeleteOrderButton").on("click", function() {
+            var order_id = $(this).data("order_id");
+            $("form[data-order_id='" + order_id + "']").submit();
         });
 
-        $("#confirmDeleteModal .btn-secondary").on("click", function() {
-            $("#confirmDeleteModal").modal("hide");
+        $("#confirmDeleteOrderModal .btn-secondary").on("click", function() {
+            $("#confirmDeleteOrderModal").modal("hide");
         });
 
-        $("#confirmDeleteModal .close").on("click", function() {
-            $("#confirmDeleteModal").modal("hide");
+        $("#confirmDeleteOrderModal .close").on("click", function() {
+            $("#confirmDeleteOrderModal").modal("hide");
         });
     });
 </script>
+
 </body>
 
 </html>

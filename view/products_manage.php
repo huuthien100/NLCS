@@ -15,7 +15,6 @@ if (isset($_POST['delete_product'])) {
         $deleteStmt = $pdo->prepare($deleteSql);
         $deleteStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
         $deleteStmt->execute();
-
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
@@ -47,7 +46,7 @@ try {
                 <ul class="nav flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                     <li class="nav-item">
                         <a href="admin.php" class="nav-link align-middle px-0 font-black">
-                            <i class="fas fa-home"></i> Trang chủ
+                            <i class="fas fa-home"></i> Trang quản lý
                         </a>
                     </li>
                     <li>
@@ -55,6 +54,7 @@ try {
                             <i class="fas fa-users"></i> Quản lý thành viên
                         </a>
                     </li>
+
                     <li>
                         <a href="category_manage.php" class="nav-link px-0 align-middle font-black">
                             <i class="fas fa-list"></i> Quản lý danh mục
@@ -66,8 +66,8 @@ try {
                         </a>
                     </li>
                     <li>
-                        <a href="comment_manage.php" class="nav-link px-0 align-middle font-black">
-                            <i class="fas fa-comments"></i> Quản lý bình luận
+                        <a href="orders_manage.php" class="nav-link px-0 align-middle font-black">
+                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                         </a>
                     </li>
                 </ul>
@@ -120,7 +120,6 @@ try {
                                     </form>
                                 </td>";
                             echo "</tr>";
-
                         }
                     }
                     ?>
@@ -131,14 +130,12 @@ try {
     </div>
 </div>
 
-<div class="modal fade" id="confirmDeleteProductModal" tabindex="-1" role="dialog"
-    aria-labelledby="exampleModalLabelProduct" aria-hidden="true">
+<div class="modal fade" id="confirmDeleteProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelProduct" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabelProduct">Xác nhận xóa sản phẩm</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                    style="border: none; box-shadow: none; background: none; font-size:25px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="border: none; box-shadow: none; background: none; font-size:25px">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -154,8 +151,8 @@ try {
 </div>
 
 <script>
-    $(document).ready(function () {
-        $(".delete-product").on("click", function () {
+    $(document).ready(function() {
+        $(".delete-product").on("click", function() {
             var productId = $(this).data("product-id");
 
             $("#confirmDeleteProductButton").data("product-id", productId);
@@ -163,23 +160,23 @@ try {
             $("#confirmDeleteProductModal").modal("show");
         });
 
-        $(document).on("keypress", function (e) {
+        $(document).on("keypress", function(e) {
             if (e.key === "Enter") {
                 $("#confirmDeleteProductButton").click();
             }
         });
 
-        $("#confirmDeleteProductButton").on("click", function () {
+        $("#confirmDeleteProductButton").on("click", function() {
             var productId = $(this).data("product-id");
             $(".delete-product-form[data-product-id='" + productId + "']").submit();
             $("#confirmDeleteProductModal").modal("hide");
         });
 
-        $("#confirmDeleteProductModal .btn-secondary").on("click", function () {
+        $("#confirmDeleteProductModal .btn-secondary").on("click", function() {
             $("#confirmDeleteProductModal").modal("hide");
         });
 
-        $("#confirmDeleteProductModal .close").on("click", function () {
+        $("#confirmDeleteProductModal .close").on("click", function() {
             $("#confirmDeleteProductModal").modal("hide");
         });
     });

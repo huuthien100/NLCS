@@ -63,9 +63,9 @@ function updateTotalPrice($itemId, $quantity)
             $user_id = $_SESSION['user_id'];
 
             $query = "SELECT c.id, c.id_product,c.total_price, p.product_name, p.product_price, c.quantity, p.product_img
-                      FROM cart c
-                      INNER JOIN products p ON c.id_product = p.id_product
-                      WHERE c.user_id = :user_id";
+                              FROM cart c
+                              INNER JOIN products p ON c.id_product = p.id_product
+                              WHERE c.user_id = :user_id";
 
             $stmt = $pdo->prepare($query);
             $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -96,17 +96,37 @@ function updateTotalPrice($itemId, $quantity)
                 echo '</tr>';
             }
             ?>
-            <tr>
-                <td colspan="4" class="align-middle">Tổng tiền:</td>
-                <td id="total" class="align-middle">0 VNĐ</td>
+        </tbody>
+        <tr>
+            <form method="POST" action="checkout.php" class="">
+                <td colspan="2">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="shipping_address" class="align-middle mt-1"><b>Địa chỉ giao hàng:</b></label>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="shipping_address" id="shipping_address" required>
+                        </div>
+                    </div>
+                </td>
+                <td class="align-middle" colspan="2">
+                    <div class="row">
+                        <label class="text-end"><b>Tổng tiền:</b></label>
+                    </div>
+                </td>
+                <td id="total" class="align-middle">
+                    0 VNĐ
+                </td>
                 <input type="hidden" id="total-value" name="total-value" value="0">
                 <td class="align-middle">
-                    <button class="btn btn-success checkout">Thanh toán</button>
+                    <button type="submit" name="checkout" class="btn btn-success checkout" id="checkout-button">Xác nhận thanh toán</button>
                 </td>
-            </tr>
-        </tbody>
+            </form>
+        </tr>
+
     </table>
 </div>
+
 <?php include('../include/footer.html') ?>
 <script>
     $(document).ready(function() {
@@ -166,21 +186,17 @@ function updateTotalPrice($itemId, $quantity)
                 total += total_price;
             });
 
-            // Update the hidden input with the total value
             $('#total-value').val(total);
             $('#total').text(total.toLocaleString('vi-VN') + ' VNĐ');
         }
-        // Bắt sự kiện khi checkbox thay đổi trạng thái
         $('.product-checkbox, #select-all').change(function() {
             calculateTotalPrice();
         });
 
-        // Bắt sự kiện khi nút "Thay đổi số lượng" được nhấn
         $('.increase-qty, .decrease-qty').click(function() {
             calculateTotalPrice();
         });
 
-        // Hàm định dạng số tiền với dấu phẩy ngăn cách hàng nghìn
         function numberWithCommas(x) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
