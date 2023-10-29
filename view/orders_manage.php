@@ -11,9 +11,9 @@ if (isset($_POST['confirm_order'])) {
     $confirm_stmt->bindParam(':order_id', $order_id_to_confirm, PDO::PARAM_INT);
 
     if ($confirm_stmt->execute()) {
-        // Đã xác nhận đơn hàng thành công, bạn có thể thực hiện các hành động khác (ví dụ: thông báo cho người dùng).
+        echo '<script>alert("Xác nhận đơn hàng thành công.");</script>';
     } else {
-        // Xác nhận đơn hàng thất bại, xử lý lỗi tại đây.
+        echo '<script>alert("Xác nhận đơn hàng thất bại.");</script>';
     }
 }
 
@@ -30,15 +30,12 @@ if (isset($_POST['confirm_delete_order'])) {
         $delete_order_stmt->bindParam(':order_id', $order_id_to_delete, PDO::PARAM_INT);
 
         if ($delete_order_stmt->execute()) {
-            // Đã xóa đơn hàng thành công, bạn có thể thực hiện các hành động khác (ví dụ: thông báo cho người dùng).
+            echo '<script>alert("Xóa đơn hàng thành công.");</script>';
         } else {
-            // Xóa đơn hàng thất bại, xử lý lỗi tại đây.
+            echo '<script>alert("Xóa đơn hàng thất bại.");</script>';
         }
-    } else {
-        // Xóa các chi tiết đơn hàng thất bại, xử lý lỗi tại đây.
     }
 }
-
 
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -133,13 +130,13 @@ try {
                             echo "<td class='" . ($order['status'] == 'Đã xác nhận' ? 'status-confirmed' : 'status-pending') . "'>" . $order['status'] . "</td>";
                             echo "<td>
                                     <button type='button' class='btn btn-success confirm-order' data-order_id='" . $order['order_id'] . "'>
-                                        <i class='fas fa-check' style='color: #ffffff;'></i> Xác nhận
+                                        <i class='fas fa-check' style='color: #ffffff;'></i>
                                     </button>
                                     <a href='order_detail.php?order_id=" . $order['order_id'] . "' class='btn btn-info'>
                                         <i class='fas fa-eye' style='color: #ffffff;'></i>
                                     </a>
                                     <button type='button' class='btn btn-danger delete-order' data-order_id='" . $order['order_id'] . "'>
-                                        <i class='fas fa-trash' style='color: #ffffff;'></i> Xóa
+                                        <i class='fas fa-trash' style='color: #ffffff;'></i>
                                     </button>
                                     <form method='post' class='confirm-order-form' style='display: none;' data-order_id='" . $order['order_id'] . "'>
                                         <input type='hidden' name='confirm_order' value='" . $order['order_id'] . "'>
