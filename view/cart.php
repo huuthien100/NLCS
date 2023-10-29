@@ -4,6 +4,23 @@ require '../include/user_session.php';
 include('../include/header.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $itemId = $_POST['itemId'];
+    $quantity = $_POST['quantity'];
+
+    $query = "UPDATE cart SET quantity = :quantity WHERE id = :itemId";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+    $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        updateTotalPrice($itemId, $quantity);
+        echo "Cập nhật giỏ hàng thành công.";
+    } else {
+        echo "Cập nhật giỏ hàng thất bại.";
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['checkout'])) {
         $selectedItems = $_POST['selectedItems'];
         if (!empty($selectedItems)) {
@@ -15,6 +32,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
         header('Location: checkout.php');
+    }
+}
+
+function updateTotalPrice($itemId, $quantity)
+{
+    global $pdo;
+    $query = "SELECT product_price FROM products WHERE id_product IN (SELECT id_product FROM cart WHERE id = :itemId)";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+    $stmt->execute();
+    $productPrice = $stmt->fetchColumn();
+
+    $totalPrice = $productPrice * $quantity;
+
+    $updateQuery = "UPDATE cart SET total_price = :totalPrice WHERE id = :itemId";
+    $updateStmt = $pdo->prepare($updateQuery);
+    $updateStmt->bindParam(':totalPrice', $totalPrice, PDO::PARAM_INT);
+    $updateStmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+    if ($updateStmt->execute()) {
     }
 }
 ?>
@@ -139,27 +175,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 success: function(data) {
                     location.reload();
                 },
-
                 error: function() {}
             });
         }
+
         $('#select-all').change(function() {
             var isChecked = $(this).is(':checked');
             $('.product-checkbox').prop('checked', isChecked);
         });
 
-        if (<?php echo count($cartItems); ?> === 1) {
-            $('.product-checkbox').change(function() {
-                var isChecked = $(this).is(':checked');
+        $('.product-checkbox').change(function() {
+            var isChecked = $(this).is(':checked');
+            var totalProducts = <?php echo count($cartItems); ?>;
+            var checkedProducts = $('.product-checkbox:checked').length;
+
+            if (checkedProducts === totalProducts) {
                 $('#select-all').prop('checked', isChecked);
-            });
-        }
+            } else {
+                $('#select-all').prop('checked', false);
+            }
+        });
 
         function calculateTotalPrice() {
             var total = 0;
             $('.product-checkbox:checked').each(function() {
                 var itemId = $(this).data('id');
-                var total_price_str = $(this).closest('tr').find('.total-amount').text().replace(' VNĐ', '').replace(/,/g, ''); // Remove existing commas
+                var total_price_str = $(this).closest('tr').find('.total-amount').text().replace(' VNĐ', '').replace(/,/g, '');
                 var total_price = parseFloat(total_price_str);
                 total += total_price;
             });
@@ -167,6 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $('#total-value').val(total);
             $('#total').text(total.toLocaleString('vi-VN') + ' VNĐ');
         }
+
         $('.product-checkbox, #select-all').change(function() {
             calculateTotalPrice();
         });
@@ -175,9 +217,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             calculateTotalPrice();
         });
 
-        function numberWithCommas(x) {
-            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
+        $('#checkout-button').click(function() {
+            var totalValue = parseFloat($('#total-value').val());
+            if (totalValue === 0) {
+                alert('Vui lòng chọn sản phẩm để thanh toán');
+                return false;
+            }
+        });
     });
 </script>
 
