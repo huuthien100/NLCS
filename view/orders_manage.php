@@ -17,6 +17,29 @@ if (isset($_POST['confirm_order'])) {
     }
 }
 
+if (isset($_POST['confirm_delete_order'])) {
+    $order_id_to_delete = $_POST['confirm_delete_order'];
+
+    $delete_order_detail_sql = "DELETE FROM order_detail WHERE order_id = :order_id";
+    $delete_order_detail_stmt = $pdo->prepare($delete_order_detail_sql);
+    $delete_order_detail_stmt->bindParam(':order_id', $order_id_to_delete, PDO::PARAM_INT);
+
+    if ($delete_order_detail_stmt->execute()) {
+        $delete_order_sql = "DELETE FROM orders WHERE order_id = :order_id";
+        $delete_order_stmt = $pdo->prepare($delete_order_sql);
+        $delete_order_stmt->bindParam(':order_id', $order_id_to_delete, PDO::PARAM_INT);
+
+        if ($delete_order_stmt->execute()) {
+            // Đã xóa đơn hàng thành công, bạn có thể thực hiện các hành động khác (ví dụ: thông báo cho người dùng).
+        } else {
+            // Xóa đơn hàng thất bại, xử lý lỗi tại đây.
+        }
+    } else {
+        // Xóa các chi tiết đơn hàng thất bại, xử lý lỗi tại đây.
+    }
+}
+
+
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -37,7 +60,7 @@ try {
 <?php include '../include/header-ad.php'; ?>
 <style>
     .status-confirmed {
-        color: #28a745	 !important;
+        color: #28a745 !important;
         font-weight: bold !important;
     }
 
@@ -47,7 +70,6 @@ try {
     }
 </style>
 <title>Quản lý đơn hàng</title>
-
 
 <div class="container-fluid">
     <div class="row flex-nowrap">
@@ -111,16 +133,19 @@ try {
                             echo "<td class='" . ($order['status'] == 'Đã xác nhận' ? 'status-confirmed' : 'status-pending') . "'>" . $order['status'] . "</td>";
                             echo "<td>
                                     <button type='button' class='btn btn-success confirm-order' data-order_id='" . $order['order_id'] . "'>
-                                        <i class='fas fa-check' style='color: #ffffff;'></i>
+                                        <i class='fas fa-check' style='color: #ffffff;'></i> Xác nhận
                                     </button>
                                     <a href='order_detail.php?order_id=" . $order['order_id'] . "' class='btn btn-info'>
                                         <i class='fas fa-eye' style='color: #ffffff;'></i>
                                     </a>
                                     <button type='button' class='btn btn-danger delete-order' data-order_id='" . $order['order_id'] . "'>
-                                        <i class='fas fa-trash' style='color: #ffffff;'></i>
+                                        <i class='fas fa-trash' style='color: #ffffff;'></i> Xóa
                                     </button>
                                     <form method='post' class='confirm-order-form' style='display: none;' data-order_id='" . $order['order_id'] . "'>
                                         <input type='hidden' name='confirm_order' value='" . $order['order_id'] . "'>
+                                    </form>
+                                    <form method='post' class='delete-order-form' style='display: none;' data-order_id='" . $order['order_id'] . "'>
+                                        <input type='hidden' name='confirm_delete_order' value='" . $order['order_id'] . "'>
                                     </form>
                                 </td>";
                             echo "</tr>";
@@ -133,6 +158,7 @@ try {
     </div>
 </div>
 
+<!-- Modal xác nhận xóa đơn hàng -->
 <div class="modal fade" id="confirmDeleteOrderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelOrder" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -146,6 +172,9 @@ try {
                 Bạn có chắc chắn muốn xóa đơn hàng này?
             </div>
             <div class="modal-footer">
+                <form method="post" id="confirmDeleteOrderForm">
+                    <input type="hidden" name="confirm_delete_order" id="confirmDeleteOrderInput">
+                </form>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteOrderButton">Xóa</button>
             </div>
@@ -153,28 +182,27 @@ try {
     </div>
 </div>
 
+
 <script>
     $(document).ready(function() {
+        $(".confirm-order").on("click", function() {
+            var order_id = $(this).data("order_id");
+            $("form[data-order_id='" + order_id + "'].confirm-order-form").submit();
+        });
         $(".delete-order").on("click", function() {
             var order_id = $(this).data("order_id");
-            $("#confirmDeleteOrderButton").data("order_id", order_id);
+            $("#confirmDeleteOrderInput").val(order_id); // Set the value of the input in the modal
             $("#confirmDeleteOrderModal").modal("show");
         });
 
-        $(".confirm-order").on("click", function() {
-            var order_id = $(this).data("order_id");
-            $("form[data-order_id='" + order_id + "']").submit();
+        $("#confirmDeleteOrderButton").on("click", function() {
+            $("#confirmDeleteOrderForm").submit(); // Submit the delete order form
         });
 
         $(document).on("keypress", function(e) {
             if (e.key === "Enter") {
                 $("#confirmDeleteOrderButton").click();
             }
-        });
-
-        $("#confirmDeleteOrderButton").on("click", function() {
-            var order_id = $(this).data("order_id");
-            $("form[data-order_id='" + order_id + "']").submit();
         });
 
         $("#confirmDeleteOrderModal .btn-secondary").on("click", function() {
@@ -186,7 +214,6 @@ try {
         });
     });
 </script>
-
 </body>
 
 </html>

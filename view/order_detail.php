@@ -32,7 +32,7 @@ include '../include/header-ad.php';
 ?>
 <style>
     .status-green {
-        color: green;
+        color: #28a745;
         font-weight: bold;
     }
 
