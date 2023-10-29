@@ -2,6 +2,21 @@
 require '../include/connect.php';
 require '../include/user_session.php';
 
+if (isset($_POST['confirm_order'])) {
+    $order_id_to_confirm = $_POST['confirm_order'];
+
+    // Thực hiện cập nhật trạng thái đơn hàng trong cơ sở dữ liệu.
+    $confirm_sql = "UPDATE orders SET status = 'Đã xác nhận' WHERE order_id = :order_id";
+    $confirm_stmt = $pdo->prepare($confirm_sql);
+    $confirm_stmt->bindParam(':order_id', $order_id_to_confirm, PDO::PARAM_INT);
+
+    if ($confirm_stmt->execute()) {
+        // Đã xác nhận đơn hàng thành công, bạn có thể thực hiện các hành động khác (ví dụ: thông báo cho người dùng).
+    } else {
+        // Xác nhận đơn hàng thất bại, xử lý lỗi tại đây.
+    }
+}
+
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -18,8 +33,21 @@ try {
     echo "Lỗi: " . $e->getMessage();
 }
 ?>
+
 <?php include '../include/header-ad.php'; ?>
+<style>
+    .status-confirmed {
+        color: #28a745	 !important;
+        font-weight: bold !important;
+    }
+
+    .status-pending {
+        color: red !important;
+        font-weight: bold !important;
+    }
+</style>
 <title>Quản lý đơn hàng</title>
+
 
 <div class="container-fluid">
     <div class="row flex-nowrap">
@@ -80,15 +108,21 @@ try {
                             echo "<td>" . $order['order_date'] . "</td>";
                             echo "<td>" . $order['shipping_address'] . "</td>";
                             echo "<td>" . number_format($order['total_price']) . ' VNĐ' . "</td>";
-                            echo "<td>" . $order['status'] . "</td>";
+                            echo "<td class='" . ($order['status'] == 'Đã xác nhận' ? 'status-confirmed' : 'status-pending') . "'>" . $order['status'] . "</td>";
                             echo "<td>
-                                <button type='button' class='btn btn-success confirm-order' data-order_id='" . $order['order_id'] . "'><i class='fa-solid fa-check' style='color: #ffffff;'></i></button>
-                                <a href='order_detail.php?order_id=" . $order['order_id'] . "' class='btn btn-info'><i class='fas fa-eye' style='color: #ffffff;'></i></a>
-                                <button type='button' class='btn btn-danger delete-order' data-order_id='" . $order['order_id'] . "'><i class='fa-solid fa-trash' style='color: #ffffff;'></i></button>
-                                <form method='post' class='delete-order-form' data-order_id='" . $order['order_id'] . "'>
-                                    <input type='hidden' name='delete_order' value='" . $order['order_id'] . "'>
-                                </form>
-                            </td>";
+                                    <button type='button' class='btn btn-success confirm-order' data-order_id='" . $order['order_id'] . "'>
+                                        <i class='fas fa-check' style='color: #ffffff;'></i>
+                                    </button>
+                                    <a href='order_detail.php?order_id=" . $order['order_id'] . "' class='btn btn-info'>
+                                        <i class='fas fa-eye' style='color: #ffffff;'></i>
+                                    </a>
+                                    <button type='button' class='btn btn-danger delete-order' data-order_id='" . $order['order_id'] . "'>
+                                        <i class='fas fa-trash' style='color: #ffffff;'></i>
+                                    </button>
+                                    <form method='post' class='confirm-order-form' style='display: none;' data-order_id='" . $order['order_id'] . "'>
+                                        <input type='hidden' name='confirm_order' value='" . $order['order_id'] . "'>
+                                    </form>
+                                </td>";
                             echo "</tr>";
                         }
                     }

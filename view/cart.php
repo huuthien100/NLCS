@@ -4,39 +4,17 @@ require '../include/user_session.php';
 include('../include/header.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    require '../include/connect.php';
-    $itemId = $_POST['itemId'];
-    $quantity = $_POST['quantity'];
-
-    $query = "UPDATE cart SET quantity = :quantity WHERE id = :itemId";
-    $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
-    $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
-
-    if ($stmt->execute()) {
-        updateTotalPrice($itemId, $quantity);
-        echo "Cập nhật giỏ hàng thành công.";
-    } else {
-        echo "Cập nhật giỏ hàng thất bại.";
-    }
-}
-
-function updateTotalPrice($itemId, $quantity)
-{
-    global $pdo;
-    $query = "SELECT product_price FROM products WHERE id_product IN (SELECT id_product FROM cart WHERE id = :itemId)";
-    $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
-    $stmt->execute();
-    $productPrice = $stmt->fetchColumn();
-
-    $totalPrice = $productPrice * $quantity;
-
-    $updateQuery = "UPDATE cart SET total_price = :totalPrice WHERE id = :itemId";
-    $updateStmt = $pdo->prepare($updateQuery);
-    $updateStmt->bindParam(':totalPrice', $totalPrice, PDO::PARAM_INT);
-    $updateStmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
-    if ($updateStmt->execute()) {
+    if (isset($_POST['checkout'])) {
+        $selectedItems = $_POST['selectedItems'];
+        if (!empty($selectedItems)) {
+            foreach ($selectedItems as $selectedItemId) {
+                $query = "DELETE FROM cart WHERE id = :itemId";
+                $stmt = $pdo->prepare($query);
+                $stmt->bindParam(':itemId', $selectedItemId, PDO::PARAM_INT);
+                $stmt->execute();
+            }
+        }
+        header('Location: checkout.php');
     }
 }
 ?>
