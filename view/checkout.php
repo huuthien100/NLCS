@@ -50,17 +50,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['checkout'])) {
         echo "Có lỗi xảy ra khi đặt hàng.";
     }
 }
-require '../include/header-ad.php';
+require '../include/header.php';
 ?>
-
+<title>Thành công</title>
 <div class="container">
     <div class="row">
         <div class="col">
             <div class="text-center mt-5">
-                <h1>Đặt hàng thành công!</h1>
-                <p>Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được đặt thành công.</p>
-                <p>Chúng tôi sẽ gửi email xác nhận đơn hàng của bạn trong thời gian sớm nhất.</p>
-                <a href="../index.php" class="btn btn-primary mt-3">Quay lại trang chủ</a>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3 text-center">
+                            <div class="alert alert-success">
+                                <h1>Đặt hàng thành công!</h1>
+                                <p>Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được đặt thành công.</p>
+                                <p>Chúng tôi sẽ xác nhận đơn hàng của bạn trong thời gian sớm nhất.</p>
+                                <a href="../index.php" class="btn btn-primary mt-3">Quay lại trang chủ</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

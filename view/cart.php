@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($selectedItems)) {
             // Chuyển dãy số thành mảng
             $selectedItemsArray = explode(',', $selectedItems);
-            
+
             foreach ($selectedItemsArray as $selectedItemId) {
                 $query = "DELETE FROM cart WHERE id = :itemId";
                 $stmt = $pdo->prepare($query);
@@ -185,7 +185,15 @@ function updateTotalPrice($itemId, $quantity)
         $('#select-all').change(function() {
             var isChecked = $(this).is(':checked');
             $('.product-checkbox').prop('checked', isChecked);
+            selectedItems = [];
+            $('.product-checkbox').each(function() {
+                if ($(this).is(':checked')) {
+                    selectedItems.push($(this).data('id'));
+                }
+            });
+            $('#selectedItems').val(selectedItems.join(','));
         });
+
 
         $('.product-checkbox').change(function() {
             var isChecked = $(this).is(':checked');
@@ -198,7 +206,6 @@ function updateTotalPrice($itemId, $quantity)
                 $('#select-all').prop('checked', false);
             }
 
-            // Cập nhật danh sách mục đã chọn
             var selectedItems = [];
             $('.product-checkbox:checked').each(function() {
                 selectedItems.push($(this).data('id'));
@@ -237,4 +244,5 @@ function updateTotalPrice($itemId, $quantity)
     });
 </script>
 </body>
+
 </html>
