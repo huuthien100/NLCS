@@ -50,101 +50,98 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../asset/script.js"></script>
 </head>
 
-    <div class="container">
-        <div class="form-container">
-            <form name="form_register" id="form_register" action="register.php" method="POST">
-                <div class="title-image">
-                    <img src="../asset/icon/register.png" alt="Hình ảnh tiêu đề">
-                </div>
-                <div class="mb-3">
-                    <label for="username" class="form-label"><i class="fa-solid fa-user"></i> Tên người dùng</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Tên người dùng"
-                        required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label"><i class="fa-solid fa-envelope"></i> Email</label>
-                    <input type="text" class="form-control" id="email" name="email" placeholder="Email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label"><i class="fa-solid fa-key"></i> Mật khẩu</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu"
-                        required>
-                </div>
-                <div class="mb-3">
-                    <label for="repassword" class="form-label"><i class="fa-solid fa-key"></i> Nhập Lại Mật khẩu</label>
-                    <input type="password" class="form-control" id="repassword" name="repassword"
-                        placeholder="Nhập lại mật khẩu" required>
-                </div>
-                Đã có tài khoản?<a href="../index.php"> Đăng nhập</a>
-                <div class="center-button mt-3">
-                    <button type="submit" class="btn btn-success">Đăng ký</button>
-                </div>
-            </form>
-        </div>
+<div class="container">
+    <div class="form-container">
+        <form name="form_register" id="form_register" action="register.php" method="POST">
+            <div class="title-image">
+                <img src="../asset/icon/register.png" alt="Hình ảnh tiêu đề">
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label"><i class="fa-solid fa-user"></i> Tên người dùng</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Tên người dùng" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label"><i class="fa-solid fa-envelope"></i> Email</label>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label"><i class="fa-solid fa-key"></i> Mật khẩu</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" required>
+            </div>
+            <div class="mb-3">
+                <label for="repassword" class="form-label"><i class="fa-solid fa-key"></i> Nhập Lại Mật khẩu</label>
+                <input type="password" class="form-control" id="repassword" name="repassword" placeholder="Nhập lại mật khẩu" required>
+            </div>
+            Đã có tài khoản?<a href="../index.php"> Đăng nhập</a>
+            <div class="center-button mt-3">
+                <button type="submit" class="btn btn-success">Đăng ký</button>
+            </div>
+        </form>
     </div>
-    <script>
-        $(document).ready(function (){
-            $.validator.addMethod(
-                "customPassword",
-                function (value, element) {
-                    return /^(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]).*$/.test(value);
+</div>
+<script>
+    $(document).ready(function() {
+        $.validator.addMethod(
+            "customPassword",
+            function(value, element) {
+                return /^(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]).*$/.test(value);
+            },
+            "Mật khẩu phải chứa ít nhất 1 chữ cái và 1 ký tự đặc biệt"
+        );
+        $("#form_register").validate({
+            rules: {
+                username: {
+                    required: true,
+                    minlength: 2,
                 },
-                "Mật khẩu phải chứa ít nhất 1 chữ cái và 1 ký tự đặc biệt"
-            );
-            $("#form_register").validate({
-                rules: {
-                    username: {
-                        required: true,
-                        minlength: 2,
-                    },
-                    email: {
-                        required: true,
-                        email: true,
-                    },
-                    password: {
-                        required: true,
-                        minlength: 6,
-                        customPassword: true,
-                    },
-                    repassword: {
-                        required: true,
-                        equalTo: "#password",
-                    },
+                email: {
+                    required: true,
+                    email: true,
                 },
-                messages: {
-                    username: {
-                        required: 'Bạn chưa nhập tên đăng nhập',
-                        minlength: 'Tên đăng nhập phải có ít nhất 2 ký tự'
-                    },
-                    email: 'Địa chỉ Email không hợp lệ',
-                    password: {
-                        required: 'Bạn chưa nhập mật khẩu',
-                        minlength: 'Mật khẩu phải có ít nhất 6 ký tự'
-                    },
-                    repassword: {
-                        required: 'Bạn chưa nhập mật khẩu',
-                        minlength: 'Mật khẩu phải có ít nhất 6 ký tự',
-                        equalTo: 'Mật khẩu không trùng khớp với mật khẩu đã nhập'
-                    },
+                password: {
+                    required: true,
+                    minlength: 6,
+                    customPassword: true,
                 },
-                errorElement: 'div',
-                errorPlacement: function (error, element) {
-                    error.addClass('invalid-feedback');
-                    if (element.prop('type') == 'checkbox') {
-                        error.insertAfter(element.siblings('label'));
-                    } else {
-                        error.insertAfter(element);
-                    }
+                repassword: {
+                    required: true,
+                    equalTo: "#password",
                 },
-                highlight: function (element, errorClass, validClass) {
-                    $(element).addClass('is-invalid').removeClass('is-valid');
+            },
+            messages: {
+                username: {
+                    required: 'Bạn chưa nhập tên đăng nhập',
+                    minlength: 'Tên đăng nhập phải có ít nhất 2 ký tự'
                 },
-                unhighlight: function (element, errorClass, validClass) {
-                    $(element).addClass('is-valid').removeClass('is-invalid');
+                email: 'Địa chỉ Email không hợp lệ',
+                password: {
+                    required: 'Bạn chưa nhập mật khẩu',
+                    minlength: 'Mật khẩu phải có ít nhất 6 ký tự'
                 },
-            });
-        )};
-    </script>
+                repassword: {
+                    required: 'Bạn chưa nhập mật khẩu',
+                    minlength: 'Mật khẩu phải có ít nhất 6 ký tự',
+                    equalTo: 'Mật khẩu không trùng khớp với mật khẩu đã nhập'
+                },
+            },
+            errorElement: 'div',
+            errorPlacement: function(error, element) {
+                error.addClass('invalid-feedback');
+                if (element.prop('type') == 'checkbox') {
+                    error.insertAfter(element.siblings('label'));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid').removeClass('is-valid');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-valid').removeClass('is-invalid');
+            },
+        });
+    });
+</script>
 </body>
 
 </html>
