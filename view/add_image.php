@@ -107,7 +107,7 @@ if (isset($_GET['product_id'])) {
 
             if ($success) {
                 echo '<script>alert("Upload thành công!");</script>';
-                echo '<script>setTimeout(function(){ window.location.href = "products_manage.php"; }, 100);</script>';
+                echo '<script>setTimeout(function(){ window.location.href = "products_manage.php"; }, 1);</script>';
                 exit;
             }
             

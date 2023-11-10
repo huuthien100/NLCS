@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['checkout'])) {
     $shipping_address = $_POST['shipping_address'];
     $total_price = $_POST['total-value'];
 
+    date_default_timezone_set('Asia/Ho_Chi_Minh');
     $order_date = date('Y-m-d H:i:s');
     $status = 'Chờ xác nhận';
 

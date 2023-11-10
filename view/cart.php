@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['checkout'])) {
         $selectedItems = isset($_POST['selectedItems']) ? $_POST['selectedItems'] : '';
         if (!empty($selectedItems)) {
-            // Chuyển dãy số thành mảng
             $selectedItemsArray = explode(',', $selectedItems);
 
             foreach ($selectedItemsArray as $selectedItemId) {
@@ -36,7 +35,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         header('Location: checkout.php');
     }
+    if (isset($_POST['deleteCartItem'])) {
+        $itemId = $_POST['deleteCartItem'];
+
+        $fetchCartItemQuery = "SELECT id_product, quantity FROM cart WHERE id = :itemId";
+        $fetchCartItemStmt = $pdo->prepare($fetchCartItemQuery);
+        $fetchCartItemStmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+        $fetchCartItemStmt->execute();
+        $cartItem = $fetchCartItemStmt->fetch(PDO::FETCH_ASSOC);
+
+        $deleteCartItemQuery = "DELETE FROM cart WHERE id = :itemId";
+        $deleteCartItemStmt = $pdo->prepare($deleteCartItemQuery);
+        $deleteCartItemStmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+
+        if ($deleteCartItemStmt->execute()) {
+            updateTotalPrice($itemId, 0);
+
+
+            echo "Xóa sản phẩm khỏi giỏ hàng thành công.";
+        } else {
+            echo "Xóa sản phẩm khỏi giỏ hàng thất bại.";
+        }
+        exit;
+    }
 }
+
 
 function updateTotalPrice($itemId, $quantity)
 {
@@ -135,7 +158,7 @@ function updateTotalPrice($itemId, $quantity)
                     0 VNĐ
                 </td>
                 <input type="hidden" id="total-value" name="total-value" value="0">
-                <input type="hidden" id="selectedItems" name="selectedItems" value=""> <!-- Trường ẩn để lưu danh sách các mục đã chọn -->
+                <input type="hidden" id="selectedItems" name="selectedItems" value="">
                 <td class="align-middle">
                     <button type="submit" name="checkout" class="btn btn-success checkout" id="checkout-button">Xác nhận thanh toán</button>
                 </td>
@@ -241,6 +264,25 @@ function updateTotalPrice($itemId, $quantity)
                 return false;
             }
         });
+        $('.remove-product').click(function(event) {
+            event.preventDefault();
+
+            var itemId = $(this).data('id');
+
+            $.ajax({
+                type: 'POST',
+                url: 'cart.php',
+                data: {
+                    deleteCartItem: itemId
+                },
+                success: function(data) {
+                    location.reload();
+                },
+                error: function() {}
+            });
+        });
+
+
     });
 </script>
 </body>

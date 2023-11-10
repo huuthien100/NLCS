@@ -5,7 +5,6 @@ require '../include/user_session.php';
 if (isset($_POST['confirm_order'])) {
     $order_id_to_confirm = $_POST['confirm_order'];
 
-    // Thực hiện cập nhật trạng thái đơn hàng trong cơ sở dữ liệu.
     $confirm_sql = "UPDATE orders SET status = 'Đã xác nhận' WHERE order_id = :order_id";
     $confirm_stmt = $pdo->prepare($confirm_sql);
     $confirm_stmt->bindParam(':order_id', $order_id_to_confirm, PDO::PARAM_INT);

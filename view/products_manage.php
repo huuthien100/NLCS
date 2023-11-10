@@ -11,6 +11,16 @@ if (isset($_POST['delete_product'])) {
     try {
         $product_id = $_POST['delete_product'];
 
+        $deleteOrderDetailSql = "DELETE FROM order_detail WHERE id_product = :product_id";
+        $deleteOrderDetailStmt = $pdo->prepare($deleteOrderDetailSql);
+        $deleteOrderDetailStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $deleteOrderDetailStmt->execute();
+
+        $deleteImgSql = "DELETE FROM product_img WHERE id_product = :product_id";
+        $deleteImgStmt = $pdo->prepare($deleteImgSql);
+        $deleteImgStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $deleteImgStmt->execute();
+
         $deleteSql = "DELETE FROM products WHERE id_product = :product_id";
         $deleteStmt = $pdo->prepare($deleteSql);
         $deleteStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);

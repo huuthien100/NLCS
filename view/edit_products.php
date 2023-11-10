@@ -65,6 +65,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 } else {
                     $img_error = "<span style='color: red;'>Lỗi khi tải lên hình ảnh sản phẩm.</span>";
                 }
+            } else {
+                $currentProductImgSql = "SELECT product_img FROM products WHERE id_product = :product_id";
+                $currentProductImgStmt = $pdo->prepare($currentProductImgSql);
+                $currentProductImgStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+                $currentProductImgStmt->execute();
+                $currentProductImg = $currentProductImgStmt->fetch(PDO::FETCH_ASSOC);
+
+                $product_img = $currentProductImg['product_img'];
             }
 
             if (empty($product_price) || !is_numeric($product_price) || $product_price <= 0) {
@@ -156,8 +164,7 @@ if (isset($_GET['product_id'])) {
             </div>
             <div class="mb-3">
                 <label for="product_name" class="form-label"><i class="fa-solid fa-file"></i> Tên sản phẩm:</label>
-                <input type="text" class="form-control" id="product_name" name="product_name"
-                    value="<?php echo $product['product_name']; ?>" required>
+                <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo $product['product_name']; ?>" required>
                 <span class="error">
                     <?php echo $name_error; ?>
                 </span>
@@ -173,8 +180,7 @@ if (isset($_GET['product_id'])) {
             <div class="mb-3">
                 <label for="product_price" class="form-label"><i class="fa-solid fa-dollar-sign"></i> Giá sản
                     phẩm:</label>
-                <input type="text" class="form-control" id="product_price" name="product_price"
-                    value="<?php echo $product['product_price']; ?>" required>
+                <input type="text" class="form-control" id="product_price" name="product_price" value="<?php echo $product['product_price']; ?>" required>
                 <span class="error">
                     <?php echo $price_error; ?>
                 </span>
