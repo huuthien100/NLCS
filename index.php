@@ -112,8 +112,7 @@ if (isset($_POST['search'])) {
                 <img id="logo" src="asset/icon/icon.png" alt="Logo" class="ms-5">
             </a>
             <div class="dropdown pt-3">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle me-4"
-                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle me-4" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                     <?php
                     if (isset($_SESSION['username'])) {
                         echo "<span style='color: black;'>Xin chào, " . $_SESSION['username'] . "!</span>__";
@@ -142,8 +141,7 @@ if (isset($_POST['search'])) {
     <div class="divider"></div>
     <!-- Nav 2 -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary stick-nav">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -152,8 +150,7 @@ if (isset($_POST['search'])) {
                     <div class="col-md-6">
                         <ul class="navbar-nav ms-5">
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Gundam
                                 </a>
                                 <ul class="dropdown-menu">
@@ -177,12 +174,9 @@ if (isset($_POST['search'])) {
                     </div>
                     <div class="col-md-6 d-flex justify-content-end">
                         <ul class="navbar-nav me-5">
-                            <form class="nav-item d-flex pe-3" role="search" method="POST"
-                                action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                                <input class="form-control me-2" type="search" name="search" placeholder="Tìm kiếm"
-                                    aria-label="Search">
-                                <button class="btn btn-dark rounded-2" type="submit"><i
-                                        class="fa-solid fa-magnifying-glass"></i></button>
+                            <form class="nav-item d-flex pe-3" role="search" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                                <input class="form-control me-2" type="search" name="search" placeholder="Tìm kiếm" aria-label="Search">
+                                <button class="btn btn-dark rounded-2" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
                             </form>
                             <li class="nav-item">
                                 <a href="view/cart.php" class="nav-icon"><i class="fas fa-shopping-cart "></i></a>
@@ -211,16 +205,11 @@ if (isset($_POST['search'])) {
                 <!-- Carousel -->
                 <div id="carouselAutoplaying" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
                     <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="0" class="active"
-                            aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="1"
-                            aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="2"
-                            aria-label="Slide 3"></button>
-                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="3"
-                            aria-label="Slide 4"></button>
-                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="4"
-                            aria-label="Slide 5"></button>
+                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#carouselAutoplaying" data-bs-slide-to="4" aria-label="Slide 5"></button>
                     </div>
                     <div class="carousel-inner mt-1">
                         <div class="carousel-item active">
@@ -299,8 +288,7 @@ if (isset($_POST['search'])) {
         <div class="container-fluid">
             <div class="row">
                 <!-- Address -->
-                <div class="col-6 pt-2 ps-5"><a href="#"><img src="asset/icon/icon.png" alt=""
-                            style="width: 250px;"></a>
+                <div class="col-6 pt-2 ps-5"><a href="#"><img src="asset/icon/icon.png" alt="" style="width: 250px;"></a>
                     <p>Địa chỉ: Đ. 3/2, P. Xuân Khánh, Q. Ninh Kiều, TP. CT</p>
                 </div>
                 <!-- End Address -->

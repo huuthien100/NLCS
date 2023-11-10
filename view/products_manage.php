@@ -44,6 +44,39 @@ try {
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
+// Handle search
+$searchResults = array();
+
+if (isset($_POST['search'])) {
+    $search = $_POST['search'];
+    $search = htmlspecialchars($search);
+
+    $searchSql = "SELECT p.id_product, p.product_name, p.product_img, p.product_price, c.name_category 
+                  FROM products p
+                  INNER JOIN category c ON p.id_category = c.id_category
+                  WHERE p.product_name LIKE :search";
+
+    $searchStmt = $pdo->prepare($searchSql);
+    $searchStmt->bindValue(':search', "%" . $search . "%", PDO::PARAM_STR);
+    $searchStmt->execute();
+    $searchResults = $searchStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Fetch all products (with or without search)
+try {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $sql = "SELECT p.id_product, p.product_name, p.product_img, p.product_price, c.name_category FROM products p
+            INNER JOIN category c ON p.id_category = c.id_category";
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute();
+
+    $productInformation = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
 ?>
 <?php include '../include/header-ad.php'; ?>
 <title>Quản lý sản phẩm</title>
@@ -87,10 +120,18 @@ try {
         <div class="col py-3">
             <div class="d-flex justify-content-between">
                 <h1>Quản lý sản phẩm</h1>
-                <a href="add_products.php" class="btn btn-success pt-3">
-                    Thêm sản phẩm <i class="fa-solid fa-plus" style="color: #ffffff"></i>
+            </div>
+            <!-- Search Form -->
+            <div class="d-flex justify-content-end mb-3">
+                <form class="nav-item d-flex pe-3" role="search" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                    <input class="form-control me-2" type="search" name="search" placeholder="Tìm kiếm" aria-label="Search">
+                    <button class="btn btn-dark rounded-2" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+                <a href="add_products.php" class="btn btn-success pt-3 d-flex justify-content-center align-middle">
+                    <i class="fa fa-plus" style="color: #ffffff"></i>
                 </a>
             </div>
+            <!-- End Search Form -->
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -103,8 +144,10 @@ try {
                 </thead>
                 <tbody>
                     <?php
-                    if (isset($productInformation) && is_array($productInformation)) {
-                        foreach ($productInformation as $product) {
+                    $displayedProducts = isset($searchResults) && !empty($searchResults) ? $searchResults : $productInformation;
+
+                    if (isset($displayedProducts) && is_array($displayedProducts)) {
+                        foreach ($displayedProducts as $product) {
                             echo "<tr>";
                             echo "<td>" . $product['name_category'] . "</td>";
                             echo "<td>" . $product['product_name'] . "</td>";
@@ -133,7 +176,6 @@ try {
                         }
                     }
                     ?>
-
                 </tbody>
             </table>
         </div>
