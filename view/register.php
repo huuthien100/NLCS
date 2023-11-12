@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="repassword" class="form-label"><i class="fa-solid fa-key"></i> Nhập Lại Mật khẩu</label>
                 <input type="password" class="form-control" id="repassword" name="repassword" placeholder="Nhập lại mật khẩu" required>
             </div>
-            Đã có tài khoản?<a href="../index.php"> Đăng nhập</a>
+            Đã có tài khoản? <a href="../index.php">Đăng nhập</a>
             <div class="center-button mt-3">
                 <button type="submit" class="btn btn-success">Đăng ký</button>
             </div>

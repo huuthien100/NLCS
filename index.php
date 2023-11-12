@@ -101,7 +101,6 @@ if (isset($_POST['search'])) {
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="asset/style.css">
-    <script src="asset/script.js"></script>
 </head>
 
 <body>

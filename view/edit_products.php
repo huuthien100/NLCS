@@ -137,7 +137,7 @@ if (isset($_GET['product_id'])) {
 
 <!-- Form -->
 <div class="container">
-    <div class="form-container">
+    <div class="form-container mb-5">
         <form method="post" id="form_edit_product" enctype="multipart/form-data">
             <div class="title-image mb-3">
                 <img src="../asset/icon/edit_product.png" alt="Hình ảnh tiêu đề">
@@ -193,6 +193,57 @@ if (isset($_GET['product_id'])) {
     </div>
 </div>
 <!-- End Form -->
+<script>
+    $(document).ready(function () {
+        $("#form_edit_product").validate({
+            rules: {
+                category_id: {
+                    required: true,
+                },
+                product_name: {
+                    required: true,
+                    minlength: 2,
+                },
+                product_img: {
+                    extension: "jpg|jpeg|png|gif",
+                },
+                product_price: {
+                    required: true,
+                    number: true,
+                    min: 0,
+                },
+            },
+            messages: {
+                category_id: {
+                    required: 'Vui lòng chọn danh mục',
+                },
+                product_name: {
+                    required: 'Vui lòng nhập tên sản phẩm',
+                    minlength: 'Tên sản phẩm phải có ít nhất 2 ký tự',
+                },
+                product_img: {
+                    extension: 'Hình ảnh phải có định dạng jpg, jpeg, png, hoặc gif',
+                },
+                product_price: {
+                    required: 'Vui lòng nhập giá sản phẩm',
+                    number: 'Vui lòng nhập số hợp lệ',
+                    min: 'Giá sản phẩm không được âm',
+                },
+            },
+            errorElement: 'div',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                error.insertAfter(element);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid').removeClass('is-valid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-valid').removeClass('is-invalid');
+            },
+        });
+    });
+</script>
 </body>
 
 </html>

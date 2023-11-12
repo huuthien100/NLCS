@@ -6,15 +6,23 @@ if (isset($_POST['delete_user'])) {
     try {
         $username = $_POST['delete_user'];
 
-        $deleteSql = "DELETE FROM users WHERE username = :username";
-        $deleteStmt = $pdo->prepare($deleteSql);
-        $deleteStmt->bindParam(':username', $username, PDO::PARAM_STR);
-        $deleteStmt->execute();
+        // Xóa dữ liệu trong bảng cart liên kết với người dùng
+        $deleteCartSql = "DELETE FROM cart WHERE user_id IN (SELECT user_id FROM users WHERE username = :username)";
+        $deleteCartStmt = $pdo->prepare($deleteCartSql);
+        $deleteCartStmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $deleteCartStmt->execute();
+
+        // Sau đó, xóa người dùng
+        $deleteUserSql = "DELETE FROM users WHERE username = :username";
+        $deleteUserStmt = $pdo->prepare($deleteUserSql);
+        $deleteUserStmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $deleteUserStmt->execute();
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
 }
 
+// Tiếp tục với việc lấy thông tin người dùng sau khi xóa
 try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

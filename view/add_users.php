@@ -62,7 +62,7 @@ if (isset($_POST['submit'])) {
 <title>Thêm thành viên</title>
 
 <!-- Form -->
-<div class="container">
+<div class="container mb-5">
     <div class="form-container">
         <form name="form_add_user" id="form_add_user" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
             method="POST">

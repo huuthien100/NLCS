@@ -73,8 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="login" class="form-label"><i class="fa-solid fa-envelope"></i> Email hoặc tên đăng
                         nhập</label>
-                    <input type="text" class="form-control" id="login" name="login"
-                        placeholder="Email hoặc tên đăng nhập" required>
+                    <input type="text" class="form-control" id="login" name="login" placeholder="Email hoặc tên đăng nhập" required>
                     <?php
                     if (!empty($login_error)) {
                         echo '<div class="alert alert-danger mt-1">' . $login_error . '</div>';
@@ -83,15 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label"><i class="fa-solid fa-key"></i> Mật khẩu</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu"
-                        required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" required>
                     <?php
                     if (!empty($password_error)) {
                         echo '<div class="alert alert-danger mt-1">' . $password_error . '</div>';
                     }
                     ?>
                 </div>
-                Chưa có tài khoản?<a href="register.php"> Đăng ký</a>
+                Chưa có tài khoản? <a href="register.php">Đăng ký</a>
                 <div class="center-button mt-3">
                     <button type="submit" class="btn btn-success">Đăng nhập</button>
                 </div>
@@ -99,6 +97,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- End Form -->
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $("#form_login").validate({
+                rules: {
+                    login: {
+                        required: true,
+                    },
+                    password: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    login: {
+                        required: 'Vui lòng nhập email hoặc tên đăng nhập',
+                    },
+                    password: {
+                        required: 'Vui lòng nhập mật khẩu',
+                    },
+                },
+                errorElement: 'div',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid').removeClass('is-valid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-valid').removeClass('is-invalid');
+                },
+            });
+        });
+    </script>
 </body>
 
 </html>

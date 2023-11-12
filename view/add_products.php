@@ -118,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- Form -->
 <div class="container">
-    <div class="form-container">
+    <div class="form-container mb-5">
         <form name="form_add_product" id="form_add_product"
             action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data">
             <div class="title-image mb-3">
@@ -176,6 +176,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 <!-- End Form -->
+<script>
+    $(document).ready(function () {
+        $("#form_add_product").validate({
+            rules: {
+                category_id: {
+                    required: true,
+                },
+                product_name: {
+                    required: true,
+                    minlength: 2,
+                },
+                product_img: {
+                    required: true,
+                    extension: "jpg|jpeg|png|gif",
+                },
+                product_price: {
+                    required: true,
+                    number: true,
+                    min: 0,
+                },
+            },
+            messages: {
+                category_id: {
+                    required: 'Bạn chưa chọn danh mục',
+                },
+                product_name: {
+                    required: 'Bạn chưa nhập tên sản phẩm',
+                    minlength: 'Tên sản phẩm phải có ít nhất 2 ký tự',
+                },
+                product_img: {
+                    required: 'Bạn chưa chọn hình ảnh sản phẩm',
+                    extension: 'Hình ảnh phải có định dạng jpg, jpeg, png, hoặc gif',
+                },
+                product_price: {
+                    required: 'Bạn chưa nhập giá sản phẩm',
+                    number: 'Vui lòng nhập số hợp lệ',
+                    min: 'Giá sản phẩm không được âm',
+                },
+            },
+            errorElement: 'div',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                error.insertAfter(element);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid').removeClass('is-valid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-valid').removeClass('is-invalid');
+            },
+        });
+    });
+</script>
 </body>
 
 </html>
