@@ -15,7 +15,6 @@ if (isset($_GET['id_product'])) {
 
     try {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        //Product Infomation
         $sql = "SELECT p.product_name, p.product_price, c.name_category, p.product_img
                 FROM products p
                 INNER JOIN category c ON p.id_category = c.id_category
@@ -25,7 +24,7 @@ if (isset($_GET['id_product'])) {
         $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
         $stmt->execute();
         $productInformation = $stmt->fetch(PDO::FETCH_ASSOC);
-        //User Infomation
+
         $userEmail = $_SESSION['email'];
 
         $query = "SELECT user_id, access FROM users WHERE email = :email";
@@ -37,7 +36,6 @@ if (isset($_GET['id_product'])) {
         $access = $user['access'];
         $user_id = $user['user_id'];
 
-        //Product Detail
         $sql = "SELECT scale, detail, equipment, decal, stand, origin, description
                 FROM product_detail
                 WHERE id_product = :id_product";
