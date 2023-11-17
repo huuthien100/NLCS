@@ -1,6 +1,7 @@
 <?php
 require '../include/connect.php';
 require '../include/user_session.php';
+
 function getCategoryName($pdo, $category_id)
 {
     $query = "SELECT name_category FROM category WHERE id_category = :category_id";
@@ -23,8 +24,8 @@ function isProductNameExistsInCategory($pdo, $product_name, $category_id, $produ
     return $check_name_stmt->rowCount() > 0;
 }
 
-$product_id = $category_id = $product_name = $product_img = $product_price = "";
-$category_error = $name_error = $img_error = $price_error = "";
+$product_id = $category_id = $product_name = $product_img = $product_price = $stock_quantity = "";
+$category_error = $name_error = $img_error = $price_error = $stock_quantity_error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['edit_product'])) {
@@ -33,6 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $category_id = $_POST['category_id'];
             $product_name = $_POST['product_name'];
             $product_price = $_POST['product_price'];
+            $stock_quantity = $_POST['stock_quantity'];
 
             if (empty($category_id)) {
                 $category_error = "<span style='color: red;'>Vui lòng chọn danh mục.</span>";
@@ -79,12 +81,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $price_error = "<span style='color: red;'>Giá sản phẩm không hợp lệ.</span>";
             }
 
-            if (empty($category_error) && empty($name_error) && empty($img_error) && empty($price_error)) {
+            if (empty($stock_quantity) || !is_numeric($stock_quantity) || $stock_quantity < 0) {
+                $stock_quantity_error = "<span style='color: red;'>Số lượng tồn kho không hợp lệ.</span>";
+            }
+
+            if (empty($category_error) && empty($name_error) && empty($img_error) && empty($price_error) && empty($stock_quantity_error)) {
                 $updateSql = "UPDATE products 
                               SET id_category = :category_id, 
                                   product_name = :product_name, 
                                   product_img = :product_img, 
-                                  product_price = :product_price 
+                                  product_price = :product_price,
+                                  stock_quantity = :stock_quantity 
                               WHERE id_product = :product_id";
 
                 $updateStmt = $pdo->prepare($updateSql);
@@ -93,6 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $updateStmt->bindParam(':product_name', $product_name, PDO::PARAM_STR);
                 $updateStmt->bindParam(':product_img', $product_img, PDO::PARAM_STR);
                 $updateStmt->bindParam(':product_price', $product_price, PDO::PARAM_STR);
+                $updateStmt->bindParam(':stock_quantity', $stock_quantity, PDO::PARAM_INT);
                 $updateStmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
 
                 if ($updateStmt->execute()) {
@@ -117,7 +125,7 @@ if (isset($_GET['product_id'])) {
     $product_id = $_GET['product_id'];
 
     try {
-        $sql = "SELECT p.id_product, p.product_name, p.product_img, p.product_price, c.name_category 
+        $sql = "SELECT p.id_product, p.product_name, p.product_img, p.product_price, p.stock_quantity, c.name_category 
                 FROM products p
                 INNER JOIN category c ON p.id_category = c.id_category
                 WHERE p.id_product = :product_id";
@@ -185,6 +193,13 @@ if (isset($_GET['product_id'])) {
                     <?php echo $price_error; ?>
                 </span>
             </div>
+            <div class="mb-3">
+                <label for="stock_quantity" class="form-label"><i class="fa-solid fa-list-ol"></i> Số lượng tồn kho:</label>
+                <input type="text" class="form-control" id="stock_quantity" name="stock_quantity" value="<?php echo $product['stock_quantity']; ?>" required>
+                <span class="error">
+                    <?php echo $stock_quantity_error; ?>
+                </span>
+            </div>
             <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
             <div class="mb-3 center-button">
                 <button type="submit" name="edit_product" class="btn btn-primary">Lưu thay đổi</button>
@@ -212,6 +227,11 @@ if (isset($_GET['product_id'])) {
                     number: true,
                     min: 0,
                 },
+                stock_quantity: {
+                    required: true,
+                    digits: true,
+                    min: 0,
+                },
             },
             messages: {
                 category_id: {
@@ -228,6 +248,11 @@ if (isset($_GET['product_id'])) {
                     required: 'Vui lòng nhập giá sản phẩm',
                     number: 'Vui lòng nhập số hợp lệ',
                     min: 'Giá sản phẩm không được âm',
+                },
+                stock_quantity: {
+                    required: 'Vui lòng nhập số lượng tồn kho',
+                    digits: 'Vui lòng chỉ nhập số nguyên dương',
+                    min: 'Số lượng tồn kho không được âm',
                 },
             },
             errorElement: 'div',

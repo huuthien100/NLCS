@@ -26,7 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['checkout'])) {
             $selectedItems = explode(',', $_POST['selectedItems']);
 
             foreach ($selectedItems as $itemId) {
-                $query = "SELECT id_product, quantity FROM cart WHERE id = :itemId AND user_id = :user_id";
+                $query = "SELECT c.id_product, c.quantity as cart_quantity, p.stock_quantity
+                          FROM cart c
+                          JOIN products p ON c.id_product = p.id_product
+                          WHERE c.id = :itemId AND c.user_id = :user_id";
                 $stmt = $pdo->prepare($query);
                 $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
                 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -37,8 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['checkout'])) {
                 $orderItemStmt = $pdo->prepare($insertOrderItemQuery);
                 $orderItemStmt->bindParam(':order_id', $orderId, PDO::PARAM_INT);
                 $orderItemStmt->bindParam(':id_product', $item['id_product'], PDO::PARAM_INT);
-                $orderItemStmt->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
+                $orderItemStmt->bindParam(':quantity', $item['cart_quantity'], PDO::PARAM_INT);
                 $orderItemStmt->execute();
+
+                $newStockQuantity = $item['stock_quantity'] - $item['cart_quantity'];
+                $updateStockQuery = "UPDATE products SET stock_quantity = :new_stock_quantity WHERE id_product = :id_product";
+                $updateStockStmt = $pdo->prepare($updateStockQuery);
+                $updateStockStmt->bindParam(':new_stock_quantity', $newStockQuantity, PDO::PARAM_INT);
+                $updateStockStmt->bindParam(':id_product', $item['id_product'], PDO::PARAM_INT);
+                $updateStockStmt->execute();
 
                 $deleteCartItemQuery = "DELETE FROM cart WHERE id = :itemId AND user_id = :user_id";
                 $deleteCartItemStmt = $pdo->prepare($deleteCartItemQuery);

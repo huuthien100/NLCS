@@ -6,41 +6,41 @@ function isProductNameExistsInCategory($pdo, $product_name, $category_id)
 {
     $check_name_query = "SELECT product_name FROM products WHERE product_name = :product_name AND id_category = :category_id";
     $check_name_stmt = $pdo->prepare($check_name_query);
-    $check_name_stmt->bindParam(':product_name', $product_name, PDO::PARAM_STR);
-    $check_name_stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
-    $check_name_stmt->execute();
+    $check_name_stmt->execute([':product_name' => $product_name, ':category_id' => $category_id]);
 
     return $check_name_stmt->rowCount() > 0;
 }
+
 function getCategoryName($pdo, $category_id)
 {
     $query = "SELECT name_category FROM category WHERE id_category = :category_id";
     $stmt = $pdo->prepare($query);
-    $stmt->bindParam(":category_id", $category_id, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt->execute([':category_id' => $category_id]);
+
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return $row ? $row['name_category'] : false;
 }
 
-$category_error = $name_error = $img_error = $price_error = '';
+$errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $input_category_id = trim($_POST["category_id"]);
-    if (empty($input_category_id)) {
-        $category_error = "<span style='color: red;'>Bạn chưa chọn Grade.</span>";
-    } else {
-        $category_id = $input_category_id;
+    $category_id = trim($_POST["category_id"]);
+    $product_name = trim($_POST["product_name"]);
+    $stock_quantity = trim($_POST["stock_quantity"]);
+    $product_price = trim($_POST["product_price"]);
+
+    if (empty($category_id)) {
+        $errors['category'] = "Bạn chưa chọn Grade.";
     }
 
-    $input_product_name = trim($_POST["product_name"]);
-    if (empty($input_product_name)) {
-        $name_error = "<span style='color: red;'>Bạn chưa nhập tên sản phẩm</span>";
-    } else {
-        $product_name = $input_product_name;
+    if (empty($product_name)) {
+        $errors['name'] = "Bạn chưa nhập tên sản phẩm";
+    } elseif (isProductNameExistsInCategory($pdo, $product_name, $category_id)) {
+        $errors['name'] = "Tên sản phẩm đã tồn tại";
+    }
 
-        if (isProductNameExistsInCategory($pdo, $product_name, $category_id)) {
-            $name_error = "<span style='color: red;'>Tên sản phẩm đã tồn tại</span>";
-        }
+    if (empty($stock_quantity) || !is_numeric($stock_quantity) || $stock_quantity < 0) {
+        $errors['stock_quantity'] = "Số lượng tồn kho không hợp lệ.";
     }
 
     if (isset($_FILES["product_img"]) && $_FILES["product_img"]["error"] === UPLOAD_ERR_OK) {
@@ -61,24 +61,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $product_img = $upload_dir . $new_file_name;
 
-            if (move_uploaded_file($tmp_name, $product_img)) {
-            } else {
-                $img_error = "<span style='color: red;'>Lỗi khi tải lên hình ảnh sản phẩm.</span>";
+            if (!move_uploaded_file($tmp_name, $product_img)) {
+                $errors['img'] = "Lỗi khi tải lên hình ảnh sản phẩm.";
             }
         } else {
-            $img_error = "<span style='color: red;'>Không tìm thấy tên danh mục.</span>";
+            $errors['img'] = "Không tìm thấy tên danh mục.";
         }
     }
 
-    $input_product_price = trim($_POST["product_price"]);
-    if (empty($input_product_price) || !is_numeric($input_product_price) || $input_product_price <= 0) {
-        $price_error = "<span style='color: red;'>Giá tiền bạn chọn không hợp lệ.</span>";
-    } else {
-        $product_price = $input_product_price;
+    if (empty($product_price) || !is_numeric($product_price) || $product_price <= 0) {
+        $errors['price'] = "Giá tiền bạn chọn không hợp lệ.";
     }
 
-    if (empty($category_error) && empty($name_error) && empty($img_error) && empty($price_error)) {
-        $insertProductSql = "INSERT INTO products (id_category, product_name, product_img, product_price) VALUES (:id_category, :product_name, :product_img, :product_price)";
+    if (empty($errors)) {
+        $insertProductSql = "INSERT INTO products (id_category, product_name, product_img, product_price, stock_quantity) VALUES (:id_category, :product_name, :product_img, :product_price, :stock_quantity)";
 
         $insertImgSql = "INSERT INTO product_img (id_product, img_url) VALUES (:id_product, :img_url)";
 
@@ -86,18 +82,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $pdo->beginTransaction();
 
             $insertProductStmt = $pdo->prepare($insertProductSql);
-            $insertProductStmt->bindParam(":id_category", $category_id, PDO::PARAM_INT);
-            $insertProductStmt->bindParam(":product_name", $product_name, PDO::PARAM_STR);
-            $insertProductStmt->bindParam(":product_img", $product_img, PDO::PARAM_STR);
-            $insertProductStmt->bindParam(":product_price", $product_price, PDO::PARAM_STR);
-            $insertProductStmt->execute();
+            $insertProductStmt->execute([
+                ':id_category' => $category_id,
+                ':product_name' => $product_name,
+                ':product_img' => $product_img,
+                ':product_price' => $product_price,
+                ':stock_quantity' => $stock_quantity,
+            ]);
 
             $newProductId = $pdo->lastInsertId();
 
             $insertImgStmt = $pdo->prepare($insertImgSql);
-            $insertImgStmt->bindParam(":id_product", $newProductId, PDO::PARAM_INT);
-            $insertImgStmt->bindParam(":img_url", $product_img, PDO::PARAM_STR);
-            $insertImgStmt->execute();
+            $insertImgStmt->execute([':id_product' => $newProductId, ':img_url' => $product_img]);
 
             $pdo->commit();
 
@@ -113,14 +109,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <?php include '../include/header-ad.php'; ?>
 <title>Thêm sản phẩm</title>
 
 <!-- Form -->
 <div class="container">
     <div class="form-container mb-5">
-        <form name="form_add_product" id="form_add_product"
-            action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data">
+        <form name="form_add_product" id="form_add_product" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data">
             <div class="title-image mb-3">
                 <img src="../asset/icon/add_product.png" alt="Hình ảnh tiêu đề" style="width: 150%">
             </div>
@@ -139,35 +135,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     ?>
                 </select>
-                <span class="error">
-                    <?php echo $category_error; ?>
-                </span>
             </div>
             <div class="mb-3">
                 <label for="product_name" class="form-label"><i class="fa-solid fa-file"></i> Tên sản phẩm:</label>
-                <input type="text" class="form-control" id="product_name" name="product_name"
-                    placeholder="Nhập tên sản phẩm" required>
-                <span class="error">
-                    <?php echo $name_error; ?>
-                </span>
+                <input type="text" class="form-control" id="product_name" name="product_name" placeholder="Nhập tên sản phẩm" required>
             </div>
             <div class="mb-3">
-                <label for="product_img" class="form-label"><i class="fa-solid fa-image"></i> Hình ảnh sản
-                    phẩm:</label>
+                <label for="product_img" class="form-label"><i class="fa-solid fa-image"></i> Hình ảnh sản phẩm:</label>
                 <input type="file" class="form-control" id="product_img" name="product_img" accept="image/*" required>
-                <span class="error">
-                    <?php echo $img_error; ?>
-                </span>
             </div>
 
             <div class="mb-3">
-                <label for="product_price" class="form-label"><i class="fa-solid fa-dollar-sign"></i> Giá sản
-                    phẩm:</label>
-                <input type="text" class="form-control" id="product_price" name="product_price"
-                    placeholder="Nhập giá sản phẩm" required>
-                <span class="error">
-                    <?php echo $price_error; ?>
-                </span>
+                <label for="product_price" class="form-label"><i class="fa-solid fa-dollar-sign"></i> Giá sản phẩm:</label>
+                <input type="text" class="form-control" id="product_price" name="product_price" placeholder="Nhập giá sản phẩm" required>
+            </div>
+            <div class="mb-3">
+                <label for="stock_quantity" class="form-label"><i class="fa-solid fa-list-ol"></i> Số lượng tồn kho:</label>
+                <input type="text" class="form-control" id="stock_quantity" name="stock_quantity" placeholder="Nhập số lượng tồn kho" required>
             </div>
             <div class="center-button">
                 <button type="submit" name="submit" class="btn btn-success">Thêm sản phẩm</button>
@@ -177,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 <!-- End Form -->
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $("#form_add_product").validate({
             rules: {
                 category_id: {
@@ -194,6 +178,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 product_price: {
                     required: true,
                     number: true,
+                    min: 0,
+                },
+                stock_quantity: {
+                    required: true,
+                    digits: true,
                     min: 0,
                 },
             },
@@ -214,21 +203,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     number: 'Vui lòng nhập số hợp lệ',
                     min: 'Giá sản phẩm không được âm',
                 },
+                stock_quantity: {
+                    required: 'Bạn chưa nhập số lượng tồn kho',
+                    digits: 'Vui lòng chỉ nhập số nguyên dương',
+                    min: 'Số lượng tồn kho không được âm',
+                },
             },
             errorElement: 'div',
-            errorPlacement: function (error, element) {
+            errorPlacement: function(error, element) {
                 error.addClass('invalid-feedback');
                 error.insertAfter(element);
             },
-            highlight: function (element, errorClass, validClass) {
+            highlight: function(element, errorClass, validClass) {
                 $(element).addClass('is-invalid').removeClass('is-valid');
             },
-            unhighlight: function (element, errorClass, validClass) {
+            unhighlight: function(element, errorClass, validClass) {
                 $(element).addClass('is-valid').removeClass('is-invalid');
             },
         });
     });
 </script>
+
 </body>
 
 </html>
