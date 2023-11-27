@@ -8,45 +8,63 @@ function getCategories($pdo)
     $stmt = $pdo->query($query);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-$categories = getCategories($pdo);
+
+function getProductInformation($pdo, $id_product)
+{
+    $sql = "SELECT p.id_product, p.product_name, p.product_price, p.stock_quantity, c.name_category, p.product_img
+            FROM products p
+            INNER JOIN category c ON p.id_category = c.id_category
+            WHERE p.id_product = :id_product";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function getUserInformation($pdo, $userEmail)
+{
+    $query = "SELECT user_id, access FROM users WHERE email = :email";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function getProductDetail($pdo, $id_product)
+{
+    $sql = "SELECT scale, detail, equipment, decal, stand, origin, description
+            FROM product_detail
+            WHERE id_product = :id_product";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
 if (isset($_GET['id_product'])) {
     $id_product = $_GET['id_product'];
 
     try {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "SELECT p.product_name, p.product_price, c.name_category, p.product_img
-                FROM products p
-                INNER JOIN category c ON p.id_category = c.id_category
-                WHERE p.id_product = :id_product";
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
-        $stmt->execute();
-        $productInformation = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Get product information
+        $productInformation = getProductInformation($pdo, $id_product);
 
+        // Get user information
         $userEmail = $_SESSION['email'];
-
-        $query = "SELECT user_id, access FROM users WHERE email = :email";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':email', $userEmail, PDO::PARAM_STR);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = getUserInformation($pdo, $userEmail);
 
         $access = $user['access'];
         $user_id = $user['user_id'];
 
-        $sql = "SELECT scale, detail, equipment, decal, stand, origin, description
-                FROM product_detail
-                WHERE id_product = :id_product";
+        // Get product detail
+        $productDetail = getProductDetail($pdo, $id_product);
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':id_product', $id_product, PDO::PARAM_INT);
-        $stmt->execute();
-        $productDetail = $stmt->fetch(PDO::FETCH_ASSOC);
         if (isset($_SESSION['successMessage'])) {
             echo '<script>alert("' . $_SESSION['successMessage'] . '");</script>';
-            unset($_SESSION['successMessage']); // Remove the success message
+            unset($_SESSION['successMessage']);
             echo '<script>window.location.href = "product_detail.php?id_product=' . $id_product . '";</script>';
         }
     } catch (PDOException $e) {
@@ -55,15 +73,20 @@ if (isset($_GET['id_product'])) {
         exit;
     }
 }
+$categories = getCategories($pdo);
 include '../include/header-pd.php';
 ?>
+
 <title>
     <?php echo $productInformation['name_category'] . ' - ' . $productInformation['product_name']; ?>
 </title>
+
 <div class="container-lg mt-3">
     <!-- Main Content -->
     <div class="row">
+        <!-- Left Column - Product Images -->
         <div class="col-lg-6 col-md-6">
+            <!-- Product Image Carousel -->
             <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <?php
@@ -78,6 +101,7 @@ include '../include/header-pd.php';
                     }
                     ?>
                 </div>
+                <!-- Carousel Navigation Buttons -->
                 <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
@@ -89,7 +113,9 @@ include '../include/header-pd.php';
             </div>
         </div>
 
+        <!-- Right Column - Product Information and Actions -->
         <div class="col-lg-6 col-md-6">
+            <!-- Product Name and Category Badge -->
             <div class="row">
                 <div class="col-lg-12 col-md-12">
                     <h1 id="product_name">
@@ -103,6 +129,7 @@ include '../include/header-pd.php';
                 </div>
             </div>
 
+            <!-- Product Rating -->
             <div class="row">
                 <div class="rating">
                     <span class="star" data-rating="1">&#9733;</span>
@@ -113,6 +140,7 @@ include '../include/header-pd.php';
                 </div>
             </div>
 
+            <!-- Product Price -->
             <div class="row">
                 <div class="col-lg-12 col-md-12 bottom-rule">
                     <h2 class="product-price" style="color: red;">
@@ -120,7 +148,8 @@ include '../include/header-pd.php';
                     </h2>
                 </div>
             </div>
-            <hr>
+
+            <!-- Product Details -->
             <div class="row">
                 <div class="col-lg-12 col-md-12">
                     <ul style="font-size: 18px;">
@@ -130,34 +159,44 @@ include '../include/header-pd.php';
                         <li><span style="font-weight: bold;">Xuất xứ: </span>
                             <?php echo !empty($productDetail['origin']) ? $productDetail['origin'] : 'Trống'; ?>
                         </li>
+                        <li><span style="font-weight: bold;">Hàng có sẵn: </span>
+                            <?php echo $productInformation['stock_quantity']; ?>
+                        </li>
                     </ul>
                 </div>
             </div>
-            <hr>
+
+            <!-- Quantity Selector and Add to Cart Button -->
             <div class="row add-to-cart">
                 <div class="col-5 product-qty">
-                <form action="add_to_cart.php" method="post">
-                    <button class="btn btn-light btn-lg" id="decreaseQty" aria-label="Decrease Quantity">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    
+                    <form id="addToCartForm" action="add_to_cart.php" method="post" onsubmit="return validateForm()">
+                        <button class="btn btn-light btn-lg" type="button" id="decreaseQty" aria-label="Decrease Quantity">
+                            <i class="fas fa-minus"></i>
+                        </button>
+
                         <input class="btn btn-light btn-lg" type="number" name="quantity" value="1" style="width: 100px;" id="quantity" readonly placeholder="1">
-                    
-                    <button class="btn btn-light btn-lg" id="increaseQty" aria-label="Increase Quantity">
-                        <i class="fas fa-plus"></i>
-                    </button>
+
+                        <button class="btn btn-light btn-lg" type="button" id="increaseQty" aria-label="Increase Quantity">
+                            <i class="fas fa-plus"></i>
+                        </button>
                 </div>
                 <div class="col-7">
-                        <input type="hidden" name="id_product" value="<?php echo $id_product; ?>">
-                        <button type="submit" class="btn btn-danger p-2" name="add_to_cart">THÊM VÀO GIỎ HÀNG</button>
-                    </form>
+                    <?php
+                    if ($productInformation['stock_quantity'] > 0) {
+                        echo '<input type="hidden" name="id_product" value="' . $id_product . '">';
+                        echo '<button type="submit" class="btn btn-success p-2" name="add_to_cart">THÊM VÀO GIỎ HÀNG</button>';
+                    } else {
+                        echo '<button type="button" class="btn btn-danger p-2" disabled>SẢN PHẨM ĐÃ HẾT HÀNG</button>';
+                    }
+                    ?>
+                    </form> 
                 </div>
             </div>
 
-
+            <!-- Horizontal Rule -->
             <hr style="color: white;">
 
-            <!-- Nav tabs -->
+            <!-- Product Tabs - Description, Features, Reviews -->
             <ul class="nav nav-tabs" id="myTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <a class="nav-link active" id="description-tab" data-bs-toggle="tab" href="#description" role="tab" aria-controls="description" aria-selected="true">Mô tả</a>
@@ -169,10 +208,10 @@ include '../include/header-pd.php';
                     <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Đánh giá</a>
                 </li>
             </ul>
-            <!-- End Nav tabs -->
 
-            <!-- Tab panes -->
+            <!-- Tab Content -->
             <div class="tab-content">
+                <!-- Description Tab -->
                 <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
                     <?php echo !empty($productDetail['description']) ? $productDetail['description'] : 'Trống'; ?>
                     <div class="image-container">
@@ -187,6 +226,7 @@ include '../include/header-pd.php';
                     </div>
                 </div>
 
+                <!-- Features Tab -->
                 <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
                     <ul>
                         <li><strong>Tỉ lệ:</strong>
@@ -208,9 +248,9 @@ include '../include/header-pd.php';
                             <?php echo !empty($productDetail['origin']) ? $productDetail['origin'] : 'Trống'; ?>
                         </li>
                     </ul>
-
                 </div>
 
+                <!-- Reviews Tab -->
                 <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                     <div class="review">
                         <div class="review-avatar">

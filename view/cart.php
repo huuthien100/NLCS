@@ -14,9 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($stmt->execute()) {
         updateTotalPrice($itemId, $quantity);
-        echo "Cập nhật giỏ hàng thành công.";
     } else {
-        echo "Cập nhật giỏ hàng thất bại.";
     }
 }
 
@@ -50,16 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($deleteCartItemStmt->execute()) {
             updateTotalPrice($itemId, 0);
-
-
-            echo "Xóa sản phẩm khỏi giỏ hàng thành công.";
         } else {
-            echo "Xóa sản phẩm khỏi giỏ hàng thất bại.";
         }
         exit;
     }
 }
-
 
 function updateTotalPrice($itemId, $quantity)
 {
