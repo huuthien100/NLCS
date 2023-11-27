@@ -128,6 +128,8 @@ if (isset($_POST['search'])) {
                         echo '<li><a class="dropdown-item" href="view/account.php">Tài khoản</a></li>';
                     }
                     ?>
+                    <li><a class="dropdown-item" href="view/order_history.php">Lịch sử đặt hàng</a></li>
+
                     <li>
                         <hr class="dropdown-divider">
                     </li>
