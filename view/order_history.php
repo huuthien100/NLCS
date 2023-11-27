@@ -56,7 +56,7 @@ $totalOrders = count($orderInformation);
         <div class="col py-3">
             <div class="d-flex justify-content-between">
                 <h1>Lịch sử đặt hàng</h1>
-                <p class='text-end'><Strong>Tổng số đơn:</Strong> <?php echo $totalOrders; ?></p>
+                <p class='text-end me-2'><Strong>Tổng số đơn:</Strong> <?php echo $totalOrders; ?></p>
             </div>
             <table class="table table-striped">
                 <thead>
